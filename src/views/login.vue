@@ -33,12 +33,9 @@
         />
         <div v-if="error.password" class="invalid-message">密碼不得空白！</div>
       </div>
-      <button class="btnLogin" type="submit" :disabled="isProcessing">
-        登入
-      </button>
+      <button class="btnLogin" type="submit" :disabled="isProcessing">登入</button>
       <div class="text-link">
-        <router-link to="/register" class="btnRegister"
-          >註冊Alphitter</router-link
+        <router-link to="/register" class="btnRegister">註冊Alphitter</router-link
         ><span class="seperater">・</span
         ><router-link to="/admin" class="btnAdmin">後台登入</router-link>
       </div>
@@ -47,7 +44,6 @@
 </template>
 
 <script>
-import authorizationAPI from "./../apis/authorization";
 import { Toast, Toast2 } from "./../utils/helper";
 
 export default {
@@ -61,76 +57,56 @@ export default {
         password: false,
         account: false,
       },
+      seedAccound: "12345678",
+      seedPassword: "0000",
     };
   },
   methods: {
-    async handleSubmit() {
-      try {
-        // 等待中登錄btn disable
-        this.isProcessing = true;
-        // 表單驗證
-        if (!this.account) {
-          this.error.account = true;
-          this.isProcessing = false;
-          return;
-        } else {
-          this.error.account = false;
-        }
-        if (!this.password) {
-          this.error.password = true;
-          this.isProcessing = false;
-          return;
-        } else {
-          this.error.password = false;
-        }
-
-        const { data } = await authorizationAPI.login({
-          account: this.account,
-          password: this.password,
-        });
-
-        // 錯誤驗證：無帳號密碼
-        if (data.message === "Error: 帳號不存在！") {
-          this.isProcessing = false;
-          this.password = "";
-          Toast2.fire({
-            title: "此帳號不存在，歡迎進行註冊！",
-          });
-          this.$router.push("/register");
-          return;
-        }
-        // 錯誤驗證：密碼錯誤
-        if (data.message === "Error: password incorrect!") {
-          this.password = "";
-          Toast2.fire({
-            title: "密碼錯誤！",
-          });
-          this.isProcessing = false;
-          return;
-        }
-        // 將 token 放到 localStorage
-        localStorage.setItem("token", data.token);
-        // 將資料傳到 Vuex
-        this.$store.commit("setCurrentUser", data.user);
-        // 成功登入後轉址到餐廳首頁
-        Toast.fire({
-          title: "登入成功！",
-        });
-        this.$router.push("/main");
-      } catch (error) {
+    handleSubmit() {
+      const userAccount = this.account;
+      const userPassword = this.password;
+      // 等待中登錄btn disable
+      this.isProcessing = true;
+      // 表單驗證
+      if (!userAccount) {
+        this.error.account = true;
         this.isProcessing = false;
-        console.log(error, "error");
-        this.password = "";
-        Toast2.fire({
-          title: "輸入的帳號密碼有誤",
-        });
+        return;
+      } else {
+        this.error.account = false;
       }
+
+      if (!userPassword) {
+        this.error.password = true;
+        this.isProcessing = false;
+        return;
+      } else {
+        this.error.password = false;
+      }
+
+      // Check the account and put in localStorage
+
+      if (userAccount === this.seedAccound && userPassword === this.seedPassword) {
+        // put in localStorage
+        localStorage.setItem("userAccount", userAccount);
+        localStorage.setItem("userPassword", userPassword);
+      } else {
+        Toast2.fire({
+          title: "輸入帳號密碼有誤！",
+        });
+        this.isProcessing = false;
+        return;
+      }
+
+      // 成功登入後轉址到餐廳首頁
+      Toast.fire({
+        title: "登入成功！",
+      });
+      this.$router.push("/main");
     },
   },
 };
 </script>
-
-
 
 <style lang="scss" scoped>
 @import "./../styles/variables.scss";
