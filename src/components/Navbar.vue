@@ -14,10 +14,7 @@
           </router-link>
         </li>
         <li :class="{ active: currentStatus.isUser }">
-          <router-link
-            :to="{ name: 'user', params: { id: currentUser.id } }"
-            class="menu__item"
-          >
+          <router-link :to="{ name: 'user', params: { id: 1 } }" class="menu__item">
             <img src="../assets/icon_user.png" alt="index" class="user" />
             <span class="menu__item__title">個人資料</span>
           </router-link>
@@ -73,7 +70,8 @@ export default {
       this.$emit("after-create-tweet-modal", payload);
     },
     logOut() {
-      localStorage.removeItem("token");
+      localStorage.removeItem("userAccount");
+      localStorage.removeItem("userPassword");
       this.$router.push("/login");
     },
   },
@@ -108,16 +106,16 @@ nav {
   .active {
     .menu__item {
       .user {
-        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg)
-          brightness(98%) contrast(110%);
+        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg) brightness(98%)
+          contrast(110%);
       }
       .index {
-        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg)
-          brightness(98%) contrast(110%);
+        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg) brightness(98%)
+          contrast(110%);
       }
       .setting {
-        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg)
-          brightness(98%) contrast(110%);
+        filter: invert(47%) sepia(15%) saturate(7114%) hue-rotate(358deg) brightness(98%)
+          contrast(110%);
       }
       &__title {
         color: $orange;
