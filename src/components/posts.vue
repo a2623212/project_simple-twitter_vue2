@@ -6,10 +6,7 @@
       :to="{ name: 'reply', params: { id: post.tweetId } }"
     >
       <div class="container">
-        <router-link
-          class="avatar"
-          :to="{ name: 'user-tweets', params: { id: post.UserId } }"
-        >
+        <router-link class="avatar" :to="{ name: 'user-tweets', params: { id: post.UserId } }">
           <img :src="post.userAvatar | emptyImage" alt="" class="avatar__pic" />
         </router-link>
         <div class="tweet-content">
@@ -50,14 +47,14 @@
               class="icon__like"
               alt=""
               v-if="post.isLiked"
-              @click.stop.prevent="deleteLike(post.tweetId)"
+              @click.stop.prevent="deleteLike()"
             />
             <img
               src="../assets/like2.png"
               class="icon__like"
               alt=""
               v-else
-              @click.stop.prevent="addLike(post.tweetId)"
+              @click.stop.prevent="addLike()"
             />
             <h5>{{ post.LikesCount }}</h5>
           </div>
@@ -70,8 +67,6 @@
 <script>
 import moment from "moment";
 import Modal from "./ReplyModal.vue";
-import { Toast2 } from "./../utils/helper";
-import tweetsAPI from "./../apis/tweets";
 import { emptyImageFilter } from "./../utils/mixins";
 
 export default {
@@ -97,42 +92,24 @@ export default {
     },
   },
   methods: {
-    afterCreateReplyModal() {
+    afterCreateReplyModal(input) {
       this.post.RepliesCount += 1;
+      console.log(input);
     },
-    async addLike(tweetId) {
-      try {
-        const { data } = await tweetsAPI.addLike({ tweetId });
-        if (data.status === "error") {
-          throw new Error(data.message);
-        }
-        this.post = {
-          ...this.post,
-          isLiked: true,
-        };
-        this.post.LikesCount += 1;
-      } catch (error) {
-        Toast2.fire({
-          title: "目前無法加入愛心",
-        });
-      }
+    addLike: function () {
+      this.post = {
+        ...this.post,
+        isLiked: true,
+      };
+      this.post.LikesCount += 1;
     },
-    async deleteLike(tweetId) {
-      try {
-        const { data } = await tweetsAPI.deleteLike({ tweetId });
-        if (data.status === "error") {
-          throw new Error(data.message);
-        }
-        this.post = {
-          ...this.post,
-          isLiked: false,
-        };
-        this.post.LikesCount -= 1;
-      } catch (error) {
-        Toast2.fire({
-          title: "目前無法移除愛心",
-        });
-      }
+
+    deleteLike: function () {
+      this.post = {
+        ...this.post,
+        isLiked: false,
+      };
+      this.post.LikesCount -= 1;
     },
   },
   filters: {

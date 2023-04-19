@@ -9,7 +9,7 @@
         </div>
         <div class="reply-container">
           <div class="avatar">
-            <img :src="post.image | emptyImage" alt="" class="avatar__pic" />
+            <img :src="post.userAvatar | emptyImage" alt="" class="avatar__pic" />
             <div class="divider">
               <div class="divider__a"></div>
               <div class="divider__b"></div>
@@ -17,12 +17,8 @@
           </div>
           <div class="tweet-content">
             <div class="title">
-              <router-link to="" class="title__name">{{
-                post.name
-              }}</router-link>
-              <router-link to="" class="title__id"
-                >@{{ post.account }}</router-link
-              >
+              <router-link to="" class="title__name">{{ post.name }}</router-link>
+              <router-link to="" class="title__id">@{{ post.account }}</router-link>
               <router-link to="" class="title__formNow"
                 >．{{ post.createdAt | fromNow }}</router-link
               >
@@ -32,9 +28,7 @@
             </p>
             <div class="hashtag">
               <router-link to="" class="hashtag__reply">回覆</router-link>
-              <router-link to="" class="hashtag__userid"
-                >@{{ post.account }}</router-link
-              >
+              <router-link to="" class="hashtag__userid">@{{ post.account }}</router-link>
             </div>
           </div>
         </div>
@@ -67,8 +61,7 @@
 </template>
 
 <script>
-import { Toast, Toast2 } from "./../utils/helper";
-import replyAPI from "./../apis/reply";
+import Toast from "./../utils/helper";
 import moment from "moment";
 moment.locale("zh-tw");
 import { emptyImageFilter } from "../utils/mixins";
@@ -100,7 +93,7 @@ export default {
     },
   },
   methods: {
-    async handleSubmit() {
+    handleSubmit: function () {
       this.isLoading = true;
       if (this.text.trim().length > 140) {
         this.isLoading = false;
@@ -112,38 +105,25 @@ export default {
         this.isLoading = false;
         return (this.noSpace = true);
       }
-      try {
-        const { data } = await replyAPI.createReply({
-          tweetId: this.post.tweetId,
-          comment: this.text,
-        });
-        this.textToMuch = false;
-        this.noSpace = false;
-        this.isLoading = false;
-        this.$emit("after-create-reply-modal", {
-          tweetId: this.post.tweetId,
-          comment: this.text,
-        });
-        this.text = "";
-        this.$emit("close");
-        if (data.status === "error") {
-          this.isLoading = false;
-          throw new Error(data.message);
-        } else {
-          Toast.fire({
-            title: "回覆成功",
-          });
-        }
-      } catch (error) {
-        Toast2.fire({
-          title: "回覆失敗，請稍後再試",
-        });
-      }
+      this.textToMuch = false;
+      this.noSpace = false;
+      this.isLoading = false;
+
+      console.log(this.text);
+
+      this.$emit("after-create-reply-modal", {
+        tweetId: this.post.tweetId,
+        comment: this.text,
+      });
+
+      this.$emit("close");
+      Toast.fire({
+        title: "回覆成功",
+      });
     },
   },
 };
 </script>
-
 
 <style lang="scss" scoped>
 .swal2-container.swal2-top-end > .swal2-popup {
