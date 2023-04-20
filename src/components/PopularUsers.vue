@@ -16,13 +16,11 @@
         <button
           class="following-btn"
           v-if="user.isFollowing"
-          @click.stop.prevent="removeFollowing(user.UserId)"
+          @click.stop.prevent="removeFollowing(user)"
         >
           正在跟隨
         </button>
-        <button class="follow-btn" v-else @click.stop.prevent="addFollowing(user.UserId)">
-          跟隨
-        </button>
+        <button class="follow-btn" v-else @click.stop.prevent="addFollowing(user)">跟隨</button>
       </div>
     </div>
   </div>
@@ -190,11 +188,36 @@ export default {
     };
   },
   methods: {
-    removeFollowing(userId) {
-      console.log(userId);
+    removeFollowing(user) {
+      console.log(user.UserId);
+      user.isFollowing = false;
+      // to change the topUser's data
+      this.topUsers = this.topUsers.map((person) => {
+        if (person.UserId === user.UserId) {
+          return {
+            ...user,
+            isFollowing: false,
+          };
+        }
+        return person;
+      });
+
+      // To be stored in localStorage later
     },
-    addFollowing(userId) {
-      console.log(userId);
+
+    addFollowing(user) {
+      console.log(user.UserId);
+      user.isFollowing = true;
+      // to change the topUser's data
+      this.topUsers = this.topUsers.map((person) => {
+        if (person.UserId === user.UserId) {
+          return {
+            ...user,
+            isFollowing: true,
+          };
+        }
+        return person;
+      });
     },
   },
 };
