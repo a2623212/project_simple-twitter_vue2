@@ -5,12 +5,12 @@
     </div>
     <div class="setting-account">
       <div class="title">
-        <h1>帳戶設定</h1>
+        <h1>Settings</h1>
       </div>
       <!--       form block -->
-      <form class="setting-form" @submit.stop.prevent="formSubmit()" novalidate>
+      <form class="setting-form" @submit.stop.prevent="submitForm()" novalidate>
         <div class="form-label-group">
-          <label for="account">帳號</label>
+          <label for="account">Account</label>
           <input
             id="account"
             v-model="account"
@@ -19,10 +19,10 @@
             required
             :class="{ invalid: error.account }"
           />
-          <div v-if="error.account" class="invalid-message">帳號不得空白！</div>
+          <div v-show="error.account" class="invalid-message">Please enter your account.</div>
         </div>
         <div class="form-label-group">
-          <label for="name">名稱</label>
+          <label for="name">Name</label>
           <input
             id="name"
             v-model="name"
@@ -31,7 +31,7 @@
             required
             :class="{ invalid: error.name }"
           />
-          <div v-if="error.name" class="invalid-message">名稱不得空白！</div>
+          <div v-show="error.name" class="invalid-message">Please enter your name.</div>
         </div>
         <div class="form-label-group">
           <label for="email">Email</label>
@@ -43,15 +43,13 @@
             required
             :class="{ invalid: error.email.length || error.email.style }"
           />
-          <div v-if="error.email.length" class="invalid-message">
-            Email 不得空白！
-          </div>
-          <div v-if="error.email.style" class="invalid-message">
-            email沒有"@"！
+          <div v-show="error.email.length" class="invalid-message">Please enter your email.</div>
+          <div v-show="error.email.style" class="invalid-message">
+            Please include an '@' in the email address.
           </div>
         </div>
         <div class="form-label-group">
-          <label for="password">密碼</label>
+          <label for="password">Enter Password</label>
           <input
             id="password"
             v-model="password"
@@ -60,12 +58,10 @@
             required
             :class="{ invalid: error.password }"
           />
-          <div v-if="error.password" class="invalid-message">
-            密碼不得空白！
-          </div>
+          <div v-show="error.password" class="invalid-message">Please enter your password.</div>
         </div>
         <div class="form-label-group">
-          <label for="password-check">密碼確認</label>
+          <label for="password-check">Confirm Password</label>
           <input
             id="password-check"
             v-model="checkPassword"
@@ -74,14 +70,10 @@
             required
             :class="{ invalid: error.checkPassword }"
           />
-          <div v-if="error.pwchecked" class="invalid-message">
-            確認密碼不得空白！
-          </div>
+          <div v-show="error.checkPassword" class="invalid-message">Passwords are not same.</div>
         </div>
         <div class="setting-block">
-          <button class="btn" type="submit" :disabled="isProcessing">
-            儲存
-          </button>
+          <button class="btn" type="submit" :disabled="isProcessing">Submit</button>
         </div>
       </form>
     </div>
@@ -89,9 +81,9 @@
 </template>
 <script>
 import Navbar from "../components/Navbar.vue";
-import settingAPI from "./../apis/setting";
-import { Toast } from "./../utils/helper";
-import { Toast2 } from "./../utils/helper";
+// import settingAPI from "./../apis/setting";
+// import { Toast } from "./../utils/helper";
+// import { Toast2 } from "./../utils/helper";
 import { mapState } from "vuex";
 
 export default {
@@ -101,9 +93,6 @@ export default {
   },
   computed: {
     ...mapState(["currentUser", "isAuthenticated"]),
-  },
-  created() {
-    this.mapCurrentUser();
   },
   data() {
     return {
@@ -127,103 +116,108 @@ export default {
         },
         password: false,
         checkPassword: false,
-        count: 0,
       },
     };
   },
   methods: {
-    async formSubmit() {
-      if (this.validiation()) {
-        return;
-      }
-      try {
-        const formData = {
-          account: this.account ? this.account : this.currentUser.account,
-          name: this.name ? this.name : this.currentUser.name,
-          email: this.email ? this.email : this.currentUser.email,
-          password: this.password,
-          checkPassword: this.checkPassword,
-        };
-        this.isProcessing = true;
+    // async formSubmit() {
+    //   if (this.validiation()) {
+    //     return;
+    //   }
+    //   try {
+    //     const formData = {
+    //       account: this.account ? this.account : this.currentUser.account,
+    //       name: this.name ? this.name : this.currentUser.name,
+    //       email: this.email ? this.email : this.currentUser.email,
+    //       password: this.password,
+    //       checkPassword: this.checkPassword,
+    //     };
+    //     this.isProcessing = true;
 
-        const { data } = await settingAPI.setUser({
-          userId: this.currentUser.id,
-          formData,
-        });
-        this.isProcessing = false;
-        //表單驗證，根據後端回傳的資料做不同的驗證
-        if (data.message === "Error: email 已重複註冊！") {
-          Toast2.fire({
-            title: "Email已重覆註冊",
-          });
-          return;
-        }
-        if (data.message === "Error: account 已重複註冊！") {
-          Toast2.fire({
-            title: "帳號已重覆註冊",
-          });
-          return;
-        }
-        if (data.message === "Error: Passwords do not match!") {
-          Toast2.fire({
-            title: "密碼不一致，請再試一次",
-          });
-          return;
-        }
-        Toast.fire({
-          title: "成功更新帳戶資料！",
-        });
-      } catch (error) {
-        this.isProcessing = false;
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法設定帳戶資料，請稍後再試",
-        });
-      }
-    },
-    mapCurrentUser() {
-      const { account, name, email } = this.currentUser;
-      this.name = name;
-      this.account = account;
-      this.email = email;
-    },
-    validiation() {
-      this.error.count = 0;
-      if (!this.account.trim()) {
+    //     const { data } = await settingAPI.setUser({
+    //       userId: this.currentUser.id,
+    //       formData,
+    //     });
+    //     this.isProcessing = false;
+    //     //表單驗證，根據後端回傳的資料做不同的驗證
+    //     if (data.message === "Error: email 已重複註冊！") {
+    //       Toast2.fire({
+    //         title: "Email已重覆註冊",
+    //       });
+    //       return;
+    //     }
+    //     if (data.message === "Error: account 已重複註冊！") {
+    //       Toast2.fire({
+    //         title: "帳號已重覆註冊",
+    //       });
+    //       return;
+    //     }
+    //     if (data.message === "Error: Passwords do not match!") {
+    //       Toast2.fire({
+    //         title: "密碼不一致，請再試一次",
+    //       });
+    //       return;
+    //     }
+    //     Toast.fire({
+    //       title: "成功更新帳戶資料！",
+    //     });
+    //   } catch (error) {
+    //     this.isProcessing = false;
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法設定帳戶資料，請稍後再試",
+    //     });
+    //   }
+    // },
+
+    submitForm() {
+      // validation
+
+      // account
+      if (this.account.trim().length === 0) {
         this.error.account = true;
-        this.error.count += 1;
+        this.account = "";
       }
-      if (!this.name.trim()) {
+      // name
+      if (this.name.trim().length === 0) {
         this.error.name = true;
-        this.error.count += 1;
+        this.name = "";
       }
-      if (!this.email.trim()) {
+      // email.length
+      if (this.email.trim().length === 0) {
         this.error.email.length = true;
-        this.error.count += 1;
+        this.email = "";
+      } else {
+        // email.style
+        if (!this.email.includes("@")) {
+          this.error.email.style = true;
+          this.email = "";
+        }
       }
-      if (!this.password.trim()) {
+
+      // password
+      if (this.password.trim() === "") {
         this.error.password = true;
-        this.error.count += 1;
+        this.password = "";
       }
-      if (!this.checkPassword.trim()) {
+      // checkPassword
+      if (this.checkPassword.trim() === "" || this.password !== this.checkPassword) {
         this.error.checkPassword = true;
-        this.error.count += 1;
+        this.checkPassword = "";
       }
-      if (this.email.trim().indexOf("@") === -1) {
-        this.error.email.style = true;
-        this.error.count += 1;
-      }
-      if (this.password.trim() !== this.checkPassword.trim()) {
-        this.error.count += 1;
-        Toast2.fire({
-          title: "密碼不一致",
-        });
-      }
-      if (this.error.count) {
-        return true;
-      }
-      return false;
+      // clear
     },
+
+    resetErrorMessage() {
+      this.error.account = false;
+      this.error.name = false;
+      this.error.email.length = false;
+      this.error.email.style = false;
+      this.error.password = false;
+      this.error.checkPassword = false;
+    },
+
+    // Current Users
   },
 };
 </script>
@@ -318,5 +312,13 @@ h1 {
   &:disabled {
     opacity: 0.7;
   }
+}
+
+.invalid-message {
+  position: absolute;
+  top: 3rem;
+  color: #fc5a5a;
+  font-size: 12px;
+  font-weight: 500;
 }
 </style>
