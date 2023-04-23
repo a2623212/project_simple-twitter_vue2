@@ -4,7 +4,7 @@
       <img src="../assets/Icon.png" alt="" />
     </div>
     <div class="title">
-      <h1>建立你的帳號</h1>
+      <h1>Register</h1>
     </div>
     <registerForm :isRegister="isRegister"></registerForm>
   </div>

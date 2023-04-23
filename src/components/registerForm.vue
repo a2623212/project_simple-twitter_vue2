@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent.stop="handleSubmit()" novalidate>
     <div class="row">
-      <label for="account">帳號</label>
+      <label for="account">account</label>
       <input
         id="account"
         name="account"
@@ -9,20 +9,22 @@
         v-model="form.account"
         required
         maxlength="50"
+        :class="{ error: error.account }"
       />
+      <div class="note" v-if="error.account">Please enter your account!</div>
     </div>
 
     <div class="row">
-      <label for="name">名稱</label>
+      <label for="name">Name</label>
       <input
         id="name"
         name="name"
         type="text"
         v-model="form.name"
         required
-        :class="{ invalid: error.length }"
+        :class="{ error: error.name || error.length }"
       />
-      <div class="note" v-if="error.name">名稱不得空白</div>
+      <div class="note" v-if="error.name">Please enter your name!</div>
 
       <div class="note" v-if="error.length">名稱長度不得大於 50 字元</div>
     </div>
@@ -36,11 +38,13 @@
         v-model="form.email"
         maxlength="50"
         required
+        :class="{ error: error.email }"
       />
+      <div class="note" v-if="error.email">Please enter your Email!</div>
     </div>
 
     <div class="row">
-      <label for="password">密碼</label>
+      <label for="password">Password</label>
       <input
         id="password"
         name="password"
@@ -48,39 +52,38 @@
         v-model="form.password"
         required
         maxLength="12"
+        :class="{ error: error.password }"
       />
+      <div class="note" v-if="error.password">Please enter your Password</div>
     </div>
     <div class="row">
-      <label for="passwordCheck">密碼確認</label>
+      <label for="passwordCheck">Confirm Password</label>
       <input
         id="passwordCheck"
         name="passwordCheck"
         type="password"
         v-model="form.checkPassword"
         required
+        :class="{ error: error.checkPassword }"
       />
+      <div class="note" v-if="error.checkPassword">Passwords are not same.</div>
     </div>
 
     <template v-if="isRegister">
       <div class="row mt-4">
         <button class="btn submit" type="submit" :disabled="isProcessing">
-          {{ isProcessing ? "註冊中.." : "註冊" }}
+          {{ isProcessing ? "Applying.." : "Apply" }}
         </button>
       </div>
       <div class="row">
         <router-link to="/login">
-          <button class="btn cancel">取消</button>
+          <button class="btn cancel">Cancel</button>
         </router-link>
       </div>
     </template>
     <template v-else>
       <div class="row">
-        <button
-          v-if="!isSaved"
-          class="btn update"
-          type="submit"
-          :disabled="isProcessing"
-        >
+        <button v-if="!isSaved" class="btn update" type="submit" :disabled="isProcessing">
           {{ isProcessing ? "儲存中.." : "儲存" }}
         </button>
         <button v-else class="btn update" disabled>已儲存</button>
@@ -90,7 +93,6 @@
 </template>
 <script>
 import { Toast, Toast2 } from "../utils/helper";
-import authorizationAPI from "../apis/authorization";
 
 export default {
   name: "registerForm",
@@ -113,8 +115,12 @@ export default {
       },
       isProcessing: false,
       error: {
+        account: false,
         length: false,
         name: false,
+        email: false,
+        password: false,
+        checkPassword: false,
       },
     };
   },
@@ -126,118 +132,57 @@ export default {
       }
       this.handleSignUpSubmit();
     },
+
     formDataCheck() {
       this.isProcessing = true;
-      let result = false;
+
       if (!this.form.account) {
-        this.error.name = true;
-        return result;
+        this.error.account = true;
+        return false;
       }
+      this.error.account = false;
       if (!this.form.name) {
-        Toast2.fire({
-          title: "請填寫名稱！",
-        });
-        return result;
+        this.error.name = true;
+        return false;
       }
+      this.error.name = false;
       if (!this.form.email) {
-        Toast2.fire({
-          title: "請填寫 Email！",
-        });
-        return result;
+        this.error.email = true;
+        return false;
       }
+      this.error.email = false;
       if (this.form.email.trim().indexOf("@") === -1) {
         Toast2.fire({
-          title: "請填寫正確的 Email！",
+          title: "Please check your email！",
         });
-        return result;
+        return false;
       }
+
       if (!this.form.password) {
-        Toast2.fire({
-          title: "請填寫密碼！",
-        });
-        return result;
+        this.error.password = true;
+        return false;
       }
+      this.error.password = false;
       if (this.form.password.length > 12 || this.form.password.length < 4) {
         Toast2.fire({
           title: "密碼長度不得小於 4 或超過 12！",
         });
-        return result;
+        return false;
       }
-      if (!this.form.checkPassword) {
-        Toast2.fire({
-          title: "請填寫密碼確認！",
-        });
-        return result;
-      }
+
       if (this.form.password !== this.form.checkPassword) {
-        Toast2.fire({
-          title: "密碼不相符！",
-        });
-        return result;
+        this.error.checkPassword = true;
+        return false;
       }
+      this.error.checkPassword = false;
       console.log("Data check passed");
       return true;
     },
-    async handleSignUpSubmit() {
-      try {
-        this.isProcessing = true;
-        const formData = {
-          name: this.form.name,
-          account: this.form.account,
-          email: this.form.email,
-          password: this.form.password,
-          checkPassword: this.form.checkPassword,
-        };
-        // call api to post formData
-        const { data } = await authorizationAPI.register(formData);
-        // verify formData from backend
-        if (data.message === "Error: email 已重複註冊！") {
-          Toast2.fire({
-            title: "email 已重複註冊！",
-          });
-          this.isProcessing = false;
-          return;
-        }
-        if (data.message === "Error: account 已重複註冊！") {
-          Toast2.fire({
-            title: "帳號已重複註冊！",
-          });
-          this.isProcessing = false;
-          return;
-        }
-        if (data.message === "Error: Passwords do not match!") {
-          Toast2.fire({
-            title: "密碼不一致",
-          });
-          this.isProcessing = false;
-          return;
-        }
-
-        Toast.fire({
-          title: "註冊成功！",
-        });
-        // 轉址
-        this.$router.push("/login");
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "暫時無法註冊，請稍後再試",
-        });
-      }
-    },
-  },
-  watch: {
-    "form.name": {
-      handler() {
-        if (this.form.name) {
-          this.error.name = false;
-        }
-        if (this.form.name.trim().length > 50) {
-          this.error.length = true;
-        } else {
-          this.error.length = false;
-        }
-      },
+    handleSignUpSubmit() {
+      Toast.fire({
+        title: "Sign up Successful!",
+      });
+      this.$router.push("/login");
     },
   },
 };
@@ -255,6 +200,14 @@ form {
   width: 540px;
   margin: 10px 0;
   position: relative;
+  & .error {
+    border-bottom: 2px solid #fc5a5a;
+
+    &:focus,
+    &:hover {
+      border-bottom: 2px solid #fc5a5a;
+    }
+  }
 }
 .row label {
   position: absolute;
@@ -285,13 +238,7 @@ form {
   color: $orange;
   color: #fc5a5a;
 }
-.row .invalid {
-  border-bottom: 2px solid #fc5a5a;
-  &:focus,
-  &:hover {
-    border-bottom: 2px solid #fc5a5a;
-  }
-}
+
 .btn {
   width: 540px;
   border-radius: 50px;
