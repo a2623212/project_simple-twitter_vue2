@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Navbar @after-create-tweet-modal="afterCreateTweetModal" :current-status="currentStatus" />
+    <Navbar @after-create-tweet="afterCreateTweet" :current-status="currentStatus" />
     <div class="main-page">
       <Tweet @after-create-tweet="afterCreateTweet" />
       <Posts :initial-post="post" v-for="post in posts" :key="post.tweetId" />
@@ -185,68 +185,53 @@ export default {
     };
   },
   methods: {
-    async afterCreateTweet(payload) {
-      const {
-        UserId,
-        name,
-        image,
-        account,
-        description,
-        RepliesCount,
-        LikesCount,
-        createdAt,
-        userAvatar,
-      } = payload;
-      this.posts.unshift({
-        UserId,
-        name,
-        image,
-        account,
-        description,
-        RepliesCount,
-        LikesCount,
-        createdAt,
-        userAvatar,
-      });
-    },
-    // async afterCreateTweetModal(tweet) {
-    //   try {
-
-    //     const { data } = await tweetsAPI.createTweet({ tweet });
-    //     console.log(data);
-    //     const {
-    //       tweetId,
-    //       UserId,
-    //       name,
-    //       image,
-    //       account,
-    //       description,
-    //       RepliesCount,
-    //       LikesCount,
-    //       createdAt,
-    //       userAvatar,
-    //     } = tweet;
-    //     this.posts.unshift({
-    //       tweetId,
-    //       UserId,
-    //       name,
-    //       image,
-    //       account,
-    //       description,
-    //       RepliesCount,
-    //       LikesCount,
-    //       createdAt,
-    //       userAvatar,
-    //     });
-    //   } catch (error) {
-    //     Toast2.fire({
-    //       title: "目前無法推文，請稍後再試",
-    //     });
-    //   }
+    // async afterCreateTweet(payload) {
+    //   const {
+    //     UserId,
+    //     name,
+    //     image,
+    //     account,
+    //     description,
+    //     RepliesCount,
+    //     LikesCount,
+    //     createdAt,
+    //     userAvatar,
+    //   } = payload;
+    //   this.posts.unshift({
+    //     UserId,
+    //     name,
+    //     image,
+    //     account,
+    //     description,
+    //     RepliesCount,
+    //     LikesCount,
+    //     createdAt,
+    //     userAvatar,
+    //   });
     // },
 
-    afterCreateTweetModal(payload) {
+    afterCreateTweet(payload) {
       console.log("text:", payload);
+      const {
+        userAvatar,
+        UserId,
+        name,
+        account,
+        description,
+        RepliesCount,
+        LikesCount,
+        createdAt,
+      } = payload;
+      this.posts.unshift({
+        userAvatar,
+        UserId,
+        name,
+        account,
+        description,
+        RepliesCount,
+        LikesCount,
+        createdAt,
+      });
       Toast.fire({
         title: "Tweet Successfully!",
       });

@@ -68,15 +68,15 @@ export default {
       console.log("text:", this.text);
       const payload = {
         userAvatar: this.currentUser.avatar,
-        userId: this.currentUser.id,
+        UserId: this.currentUser.id,
         name: this.currentUser.name,
         account: this.currentUser.account,
         description: this.text,
-        repliesCount: 0,
-        likesCount: 0,
+        RepliesCount: 0,
+        LikesCount: 0,
         createdAt: new Date(),
       };
-      this.$emit("after-create-tweet-modal", payload);
+      this.$emit("after-create-tweet", payload);
       this.textToMuch = false;
       this.noSpace = false;
       this.text = "";

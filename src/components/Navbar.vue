@@ -28,11 +28,7 @@
       </ul>
     </div>
     <button class="twit-button" @click="showModal = true">推文</button>
-    <Modal
-      :show="showModal"
-      @close="showModal = false"
-      @after-create-tweet-modal="afterCreateTweetModal"
-    />
+    <Modal :show="showModal" @close="showModal = false" @after-create-tweet="afterCreateTweet" />
     <div id="log-out" @click.stop.prevent="logOut">
       <div>
         <img src="./../assets/Vector.png" alt="logoOut" class="icon" />
@@ -66,8 +62,8 @@ export default {
     };
   },
   methods: {
-    afterCreateTweetModal(payload) {
-      this.$emit("after-create-tweet-modal", payload);
+    afterCreateTweet(payload) {
+      this.$emit("after-create-tweet", payload);
     },
     logOut() {
       localStorage.removeItem("userAccount");

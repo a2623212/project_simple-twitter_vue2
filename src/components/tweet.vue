@@ -16,9 +16,7 @@
         <div class="submit-group">
           <div class="warn" v-show="textToMuch">字數不可超過140字</div>
           <div class="warn__2" v-show="noSpace">內容不可空白</div>
-          <button type="submit" class="btn-tweet" :disabled="isLoading">
-            推文
-          </button>
+          <button type="submit" class="btn-tweet" :disabled="isLoading">推文</button>
         </div>
       </div>
     </form>
@@ -27,9 +25,9 @@
 </template>
 
 <script>
-import tweetsAPI from "../apis/tweets.js";
+// import tweetsAPI from "../apis/tweets.js";
 import { Toast } from "./../utils/helper";
-import { Toast2 } from "./../utils/helper";
+// import { Toast2 } from "./../utils/helper";
 import { mapState } from "vuex";
 import { emptyImageFilter } from "../utils/mixins";
 
@@ -47,7 +45,7 @@ export default {
     ...mapState(["currentUser", "isAuthenticated"]),
   },
   methods: {
-    async handleSubmit() {
+    handleSubmit() {
       this.isLoading = true;
       if (this.text.trim().length > 140) {
         this.isLoading = false;
@@ -59,37 +57,23 @@ export default {
         this.isLoading = false;
         return (this.noSpace = true);
       }
-      try {
-        const { data } = await tweetsAPI.createTweet({
-          image: this.currentUser.avatar,
-          description: this.text,
-        });
-        this.textToMuch = false;
-        this.noSpace = false;
-        Toast.fire({
-          title: "發文成功",
-        });
-        this.isLoading = false;
-        if (data.status === "error") {
-          this.isLoading = false;
-          throw new Error(data.message);
-        }
-        this.$emit("after-create-tweet", {
-          userAvatar: this.currentUser.avatar,
-          UserId: this.currentUser.id,
-          name: this.currentUser.name,
-          image: this.currentUser.avatar,
-          account: this.currentUser.account,
-          description: this.text,
-          RepliesCount: 0,
-          LikesCount: 0,
-          createdAt: new Date(),
-        });
-      } catch (error) {
-        Toast2.fire({
-          title: "無法推文",
-        });
-      }
+      this.textToMuch = false;
+      this.noSpace = false;
+      console.log("text:", this.text);
+      Toast.fire({
+        title: "Tweet Sucessfully",
+      });
+      const payload = {
+        userAvatar: this.currentUser.avatar,
+        UserId: this.currentUser.id,
+        name: this.currentUser.name,
+        account: this.currentUser.account,
+        description: this.text,
+        RepliesCount: 0,
+        LikesCount: 0,
+        createdAt: new Date(),
+      };
+      this.$emit("after-create-tweet", payload);
       this.text = "";
     },
   },
