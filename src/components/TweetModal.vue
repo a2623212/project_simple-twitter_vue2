@@ -22,9 +22,7 @@
         <div class="modal-footer">
           <div class="warn" v-show="textToMuch">字數不可超過140字</div>
           <div class="warn__2" v-show="noSpace">內容不可空白</div>
-          <button class="modal-default-button" :disabled="isLoading">
-            推文
-          </button>
+          <button class="modal-default-button" :disabled="isLoading">推文</button>
         </div>
       </form>
     </div>
@@ -32,9 +30,9 @@
 </template>
 
 <script>
-import tweetsAPI from "../apis/tweets.js";
-import { Toast } from "./../utils/helper";
-import { Toast2 } from "./../utils/helper";
+// import tweetsAPI from "../apis/tweets.js";
+// import { Toast } from "./../utils/helper";
+// import { Toast2 } from "./../utils/helper";
 import { mapState } from "vuex";
 import { emptyImageFilter } from "../utils/mixins";
 
@@ -55,7 +53,7 @@ export default {
     ...mapState(["currentUser", "isAuthenticated"]),
   },
   methods: {
-    async handleSubmit() {
+    handleSubmit() {
       this.isLoading = true;
       if (this.text.trim().length > 140) {
         this.isLoading = false;
@@ -67,39 +65,23 @@ export default {
         this.isLoading = false;
         return (this.noSpace = true);
       }
-      try {
-        const { data } = await tweetsAPI.createTweet({
-          image: this.currentUser.avatar,
-          description: this.text,
-        });
-        Toast.fire({
-          title: "推文發送成功",
-        });
-        this.$emit("after-create-tweet-modal", {
-          userAvatar: this.currentUser.avatar,
-          UserId: this.currentUser.id,
-          name: this.currentUser.name,
-          image: this.currentUser.avatar,
-          account: this.currentUser.account,
-          description: this.text,
-          RepliesCount: 0,
-          LikesCount: 0,
-          createdAt: new Date(),
-        });
-        this.textToMuch = false;
-        this.noSpace = false;
-        this.text = "";
-        this.$emit("close");
-        this.isLoading = false;
-        if (data.status === "error") {
-          this.isLoading = false;
-          throw new Error(data.message);
-        }
-      } catch (error) {
-        Toast2({
-          title: "目前無法推文",
-        });
-      }
+      console.log("text:", this.text);
+      const payload = {
+        userAvatar: this.currentUser.avatar,
+        userId: this.currentUser.id,
+        name: this.currentUser.name,
+        account: this.currentUser.account,
+        description: this.text,
+        repliesCount: 0,
+        likesCount: 0,
+        createdAt: new Date(),
+      };
+      this.$emit("after-create-tweet-modal", payload);
+      this.textToMuch = false;
+      this.noSpace = false;
+      this.text = "";
+      this.$emit("close");
+      this.isLoading = false;
     },
   },
 };

@@ -14,8 +14,8 @@ import Tweet from "../components/tweet.vue";
 import Posts from "../components/posts.vue";
 import Navbar from "../components/Navbar.vue";
 import Popular from "../components/PopularUsers.vue";
-import tweetsAPI from "../apis/tweets.js";
-import { Toast2 } from "./../utils/helper";
+// import tweetsAPI from "../apis/tweets.js";
+import Toast from "./../utils/helper";
 import { mapState } from "vuex";
 
 export default {
@@ -209,39 +209,47 @@ export default {
         userAvatar,
       });
     },
-    async afterCreateTweetModal(tweet) {
-      try {
-        const { data } = await tweetsAPI.createTweet({ tweet });
-        console.log(data);
-        const {
-          tweetId,
-          UserId,
-          name,
-          image,
-          account,
-          description,
-          RepliesCount,
-          LikesCount,
-          createdAt,
-          userAvatar,
-        } = tweet;
-        this.posts.unshift({
-          tweetId,
-          UserId,
-          name,
-          image,
-          account,
-          description,
-          RepliesCount,
-          LikesCount,
-          createdAt,
-          userAvatar,
-        });
-      } catch (error) {
-        Toast2.fire({
-          title: "目前無法推文，請稍後再試",
-        });
-      }
+    // async afterCreateTweetModal(tweet) {
+    //   try {
+
+    //     const { data } = await tweetsAPI.createTweet({ tweet });
+    //     console.log(data);
+    //     const {
+    //       tweetId,
+    //       UserId,
+    //       name,
+    //       image,
+    //       account,
+    //       description,
+    //       RepliesCount,
+    //       LikesCount,
+    //       createdAt,
+    //       userAvatar,
+    //     } = tweet;
+    //     this.posts.unshift({
+    //       tweetId,
+    //       UserId,
+    //       name,
+    //       image,
+    //       account,
+    //       description,
+    //       RepliesCount,
+    //       LikesCount,
+    //       createdAt,
+    //       userAvatar,
+    //     });
+    //   } catch (error) {
+    //     Toast2.fire({
+    //       title: "目前無法推文，請稍後再試",
+    //     });
+    //   }
+    // },
+
+    afterCreateTweetModal(payload) {
+      console.log("text:", payload);
+      Toast.fire({
+        title: "Tweet Successfully!",
+      });
     },
   },
 };
