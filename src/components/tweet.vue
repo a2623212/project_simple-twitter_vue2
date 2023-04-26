@@ -85,6 +85,7 @@ export default {
   width: 600px;
   display: flex;
   flex-direction: column;
+  
   .home {
     opacity: 0.9;
     z-index: 995;
@@ -112,18 +113,19 @@ export default {
       width: 50px;
       height: 50px;
       position: relative;
-      margin-top: 10px;
-      margin-left: 15px;
+      margin: {
+        top: 10px;
+        left: 15px;
+        right: 5px;
+      }
       border-radius: 100%;
     }
     .right-place {
       display: flex;
       flex-direction: column;
       textarea {
-        margin-top: 20px;
-        margin-left: 5px;
         resize: none;
-        width: 530px;
+        width: 100%;
         height: 94px;
         border: none;
         font-size: 25px;
