@@ -1,18 +1,15 @@
 import { apiHelper } from "../utils/helper";
 const getToken = () => localStorage.getItem("token");
+const getUsers = apiHelper.get(`/users`);
 
 export default {
   // 取得User的資料 (需要user ID)
-  get({ userId }) {
-    return apiHelper.get(`/users/${userId}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  get() {
+    return getUsers;
   },
   // 取得User的推文資料 (需要user ID)
-  getTweets({ userId }) {
-    return apiHelper.get(`/users/${userId}/tweets`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  getTweets() {
+    return getUsers;
   },
   // 取得User的回覆資料  (需要user ID)
   getReplies({ userId }) {
@@ -62,8 +59,8 @@ export default {
   },
   //抓currentUser到vuex
   getCurrentUser() {
-    return apiHelper.get('/user', {
+    return apiHelper.get("/user", {
       headers: { Authorization: `Bearer ${getToken()}` },
-    })
-  }
+    });
+  },
 };
