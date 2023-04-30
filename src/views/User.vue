@@ -70,6 +70,7 @@ export default {
     const thisUserId = this.thisUserId;
     this.fetchUser(thisUserId);
     this.fetchTweets(thisUserId);
+    this.fetchReplies(thisUserId);
     // this.$watch(
     //   () => this.$route.params,
     //   (newV, oldV) => {
@@ -138,7 +139,7 @@ export default {
         const data = await usersAPI.getTweets(id);
         this.tweets = data;
         Toast.fire({
-          title: " you got the right data!",
+          title: " you got the right tweets data!",
         });
       } catch (error) {
         console.log("error", error);
@@ -147,29 +148,20 @@ export default {
         });
       }
     },
-    // async fetchReplies(userId) {
-    //   try {
-    //     const { data } = await usersAPI.getReplies({ userId });
-    //     if (data.isEmpty) {
-    //       this.replyTweets = [];
-    //       return;
-    //     }
-    //     if (data.message === "Error: No replies") {
-    //       console.log("error", data.message);
-    //       Toast2.fire({
-    //         title: "目前沒有推文及回覆內容",
-    //       });
-    //       this.replyTweets = [];
-    //       return;
-    //     }
-    //     this.replyTweets = data;
-    //   } catch (error) {
-    //     console.log("error", error);
-    //     Toast2.fire({
-    //       title: "無法取得資料，請稍後再試",
-    //     });
-    //   }
-    // },
+    async fetchReplies(userId) {
+      try {
+        const data = await usersAPI.getReplies(userId);
+        this.replyTweets = data;
+        Toast.fire({
+          title: " you got the right replies data!",
+        });
+      } catch (error) {
+        console.log("error", error);
+        Toast2.fire({
+          title: "Unable to retrieve user data.",
+        });
+      }
+    },
     // // empty:處理面對空值的回傳方法
     // async fetchLikes(userId) {
     //   try {

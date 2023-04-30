@@ -25,10 +25,15 @@ export default {
   },
 
   // 取得User的回覆資料  (需要user ID)
-  getReplies({ userId }) {
-    return apiHelper.get(`/users/${userId}/replied_tweets`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  async getReplies(userId) {
+    try {
+      const { data } = await getUser();
+      const thisUser = data.find((user) => user.userId === userId);
+      return thisUser.replies;
+    } catch (error) {
+      console.log("this error from api:", error);
+      return error;
+    }
   },
   // 取得User的喜愛內容 (需要user ID)
   getLikes({ userId }) {
