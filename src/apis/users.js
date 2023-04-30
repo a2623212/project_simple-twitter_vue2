@@ -36,11 +36,17 @@ export default {
     }
   },
   // 取得User的喜愛內容 (需要user ID)
-  getLikes({ userId }) {
-    return apiHelper.get(`/users/${userId}/likes`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  async getLikes(userId) {
+    try {
+      const { data } = await getUser();
+      const thisUser = data.find((user) => user.userId === userId);
+      return thisUser.likes;
+    } catch (error) {
+      console.log("this error from api:", error);
+      return error;
+    }
   },
+
   // 取得topUser的資料
   getTopUser() {
     return apiHelper.get("/users/top", { headers: { Authorization: `Bearer ${getToken()}` } });

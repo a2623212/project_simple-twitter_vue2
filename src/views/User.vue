@@ -71,18 +71,21 @@ export default {
     this.fetchUser(thisUserId);
     this.fetchTweets(thisUserId);
     this.fetchReplies(thisUserId);
-    // this.$watch(
-    //   () => this.$route.params,
-    //   (newV, oldV) => {
-    //     if (newV.id === oldV.id) {
-    //       return;
-    //     } else {
-    //       const userId = newV.id;
-    //       this.fetchUser(uthisUserId);
-    //       this.fetchTweets(userId);
-    //     }
-    //   }
-    // );
+    this.fetchLikes(thisUserId);
+    this.$watch(
+      () => this.$route.params,
+      (newV, oldV) => {
+        if (newV.id === oldV.id) {
+          return;
+        } else {
+          const userId = newV.id;
+          this.fetchUser(userId);
+          this.fetchTweets(userId);
+          this.fetchReplies(userId);
+          this.fetchLikes(userId);
+        }
+      }
+    );
   },
 
   data() {
@@ -162,34 +165,19 @@ export default {
         });
       }
     },
-    // // empty:處理面對空值的回傳方法
-    // async fetchLikes(userId) {
-    //   try {
-    //     const { data } = await usersAPI.getLikes({ userId });
-    //     if (data.message === "TypeError: Cannot read properties of null (reading 'Likes')") {
-    //       Toast2.fire({
-    //         title: "目前沒有喜歡的內容",
-    //       });
-    //       this.likes = [];
-    //       return;
-    //     }
-    //     if (data.isEmpty) {
-    //       console.log("error", data.message);
-    //       Toast2.fire({
-    //         title: "目前沒有喜歡的內容",
-    //       });
-    //       this.likes = [];
-    //       return;
-    //     }
-    //     this.likes = data;
-    //   } catch (error) {
-    //     console.log("error", error);
-    //     Toast2.fire({
-    //       title: "無法取得資料，請稍後再試",
-    //     });
-    //     this.likes = [];
-    //   }
-    // },
+    // empty:處理面對空值的回傳方法
+    async fetchLikes(userId) {
+      try {
+        const data = await usersAPI.getLikes(userId);
+        this.likes = data;
+        console.log("get the right Likes data!");
+      } catch (error) {
+        console.log("error", error);
+        Toast2.fire({
+          title: "Unable to retrieve user data.",
+        });
+      }
+    },
     // async fetchFollowers(userId) {
     //   try {
     //     const { data } = await usersAPI.getFollowers({ userId });
