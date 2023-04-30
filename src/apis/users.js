@@ -1,16 +1,29 @@
 import { apiHelper } from "../utils/helper";
 const getToken = () => localStorage.getItem("token");
-const getUsers = apiHelper.get(`/users`);
+const getUser = () => apiHelper.get("/users");
 
 export default {
   // 取得User的資料 (需要user ID)
-  get() {
-    return getUsers;
+  async get(userId) {
+    try {
+      const { data } = await apiHelper.get(`/users/${userId}`);
+      const userData = data[0];
+      return userData;
+    } catch (error) {
+      return error;
+    }
   },
   // 取得User的推文資料 (需要user ID)
-  getTweets() {
-    return getUsers;
+  async getTweets(userId) {
+    try {
+      const { data } = await getUser();
+      const thisUser = data.find((user) => user.userId === userId);
+      return thisUser.tweets;
+    } catch (error) {
+      return error;
+    }
   },
+
   // 取得User的回覆資料  (需要user ID)
   getReplies({ userId }) {
     return apiHelper.get(`/users/${userId}/replied_tweets`, {

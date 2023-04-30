@@ -49,7 +49,7 @@
 import Navbar from "../components/Navbar.vue";
 import PopularUsers from "../components/PopularUsers.vue";
 import usersAPI from "./../apis/users";
-// import tweetsAPI from "./../apis/tweets";
+import tweetsAPI from "./../apis/tweets";
 import { Toast, Toast2 } from "./../utils/helper";
 import { mapState } from "vuex";
 
@@ -67,24 +67,21 @@ export default {
     },
   },
   created() {
-    this.fetchUser();
-    this.fetchTweets();
-    this.$watch(
-      () => this.$route.params,
-      (newV, oldV) => {
-        if (newV.id === oldV.id) {
-          return;
-        } else {
-          const userId = newV.id;
-          this.fetchUser(userId);
-          this.fetchTweets(userId);
-          this.fetchLikes(userId);
-          this.fetchReplies(userId);
-          this.fetchFollowers(userId);
-          this.fetchFollowings(userId);
-        }
-      }
-    );
+    const thisUserId = this.thisUserId;
+    this.fetchUser(thisUserId);
+    this.fetchTweets(thisUserId);
+    // this.$watch(
+    //   () => this.$route.params,
+    //   (newV, oldV) => {
+    //     if (newV.id === oldV.id) {
+    //       return;
+    //     } else {
+    //       const userId = newV.id;
+    //       this.fetchUser(uthisUserId);
+    //       this.fetchTweets(userId);
+    //     }
+    //   }
+    // );
   },
 
   data() {
@@ -114,16 +111,11 @@ export default {
     };
   },
   methods: {
-    async fetchUser() {
+    async fetchUser(id) {
       try {
-        const { data } = await usersAPI.get();
-        Toast.fire({
-          title: "get sucessfully",
-        });
-        const thisUser = data.find((item) => item.userId === this.thisUserId);
-
+        const data = await usersAPI.get(id);
         const { userId, name, userAvatar, introduction, account, cover, followers, followings } =
-          thisUser;
+          data;
         this.user = {
           userId,
           name,
@@ -141,15 +133,17 @@ export default {
         });
       }
     },
-    async fetchTweets() {
+    async fetchTweets(id) {
       try {
-        const { data } = await usersAPI.getTweets();
-        const thisUser = data.find((item) => item.userId === this.thisUserId);
-        console.log(thisUser.tweets);
+        const data = await usersAPI.getTweets(id);
+        this.tweets = data;
+        Toast.fire({
+          title: " you got the right data!",
+        });
       } catch (error) {
         console.log("error", error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
@@ -269,29 +263,29 @@ export default {
     //     });
     //   }
     // },
-    // async handleDeleteLike(tweetId) {
-    //   try {
-    //     const { data } = await tweetsAPI.deleteLike({ tweetId });
-    //     if (data.status === "error") {
-    //       throw new Error(data.message);
-    //     }
-    //     this.tweets = this.tweets.map((tweet) => {
-    //       if (tweet.tweetId === tweetId) {
-    //         return {
-    //           ...tweet,
-    //           LikesCount: tweet.LikesCount - 1,
-    //           isLiked: false,
-    //         };
-    //       }
-    //       return tweet;
-    //     });
-    //   } catch (error) {
-    //     console.log("error", error);
-    //     Toast2.fire({
-    //       title: "無法取消喜歡，請稍後再試",
-    //     });
-    //   }
-    // },
+    async handleDeleteLike(tweetId) {
+      try {
+        const { data } = await tweetsAPI.deleteLike({ tweetId });
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+        this.tweets = this.tweets.map((tweet) => {
+          if (tweet.tweetId === tweetId) {
+            return {
+              ...tweet,
+              LikesCount: tweet.LikesCount - 1,
+              isLiked: false,
+            };
+          }
+          return tweet;
+        });
+      } catch (error) {
+        console.log("error", error);
+        Toast2.fire({
+          title: "Unable to unlike!",
+        });
+      }
+    },
     // async handleDeleteLikePost(tweetId) {
     //   try {
     //     const { data } = await tweetsAPI.deleteLike({ tweetId });
