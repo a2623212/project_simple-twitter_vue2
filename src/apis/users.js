@@ -2,6 +2,28 @@ import { apiHelper } from "../utils/helper";
 const getToken = () => localStorage.getItem("token");
 const getUser = () => apiHelper.get("/users");
 
+// const filterUser = async (userId) => {
+//   const { data } = await getUser();
+//   const thisUser = data.find((user) => user.userId === userId);
+//   return thisUser;
+// };
+
+// function declaration
+async function filterUser(userId) {
+  const { data } = await getUser();
+  const thisUser = data.find((user) => user.userId === userId);
+  return thisUser;
+}
+
+// const filterUser = (userId) => {
+//   return getUser().then(({ data }) => {
+//     const thisUser = data.find((user) => user.userId === userId);
+//     console.log("🚀 ~ file: users.js:23 ~ returngetUser ~ thisUser:", thisUser)
+//     return thisUser;
+//   });
+
+// };
+
 export default {
   // 取得User的資料 (需要user ID)
   async get(userId) {
@@ -16,9 +38,12 @@ export default {
   // 取得User的推文資料 (需要user ID)
   async getTweets(userId) {
     try {
-      const { data } = await getUser();
-      const thisUser = data.find((user) => user.userId === userId);
-      return thisUser.tweets;
+      const thisUser = await filterUser(userId);
+
+      const result = thisUser.tweets;
+      console.log("🚀 ~ file: users.js:22 ~ getTweets ~ result:", result);
+
+      return result;
     } catch (error) {
       return error;
     }
@@ -52,17 +77,26 @@ export default {
     return apiHelper.get("/users/top", { headers: { Authorization: `Bearer ${getToken()}` } });
   },
   // 取得follower的資料
-  getFollowers({ userId }) {
-    return apiHelper.get(`/users/${userId}/followers`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  async getFollowers(userId) {
+    try {
+      const { data } = await getUser();
+      const thisUser = data.find((user) => user.userId === userId);
+      return thisUser.followers;
+    } catch (error) {
+      return console.log("this is error from api getFollowers:", error);
+    }
   },
   //取得following的資料
-  getFollowings({ userId }) {
-    return apiHelper.get(`/users/${userId}/followings`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  async getFollowings(userId) {
+    try {
+      const { data } = await getUser();
+      const thisUser = data.find((user) => user.userId === userId);
+      return thisUser.followings;
+    } catch (error) {
+      return console.log("this is error from api getFollowings:", error);
+    }
   },
+
   // 上傳個人資料更新
   update({ userId, formData }) {
     return apiHelper.put(`/users/${userId}`, formData, {

@@ -72,17 +72,22 @@ export default {
     this.fetchTweets(thisUserId);
     this.fetchReplies(thisUserId);
     this.fetchLikes(thisUserId);
+    this.fetchFollowers(thisUserId);
+    this.fetchFollowings(thisUserId);
     this.$watch(
       () => this.$route.params,
       (newV, oldV) => {
         if (newV.id === oldV.id) {
           return;
         } else {
-          const userId = newV.id;
+          const userId = Number(newV.id);
+          console.log("renew the page", userId);
           this.fetchUser(userId);
           this.fetchTweets(userId);
           this.fetchReplies(userId);
           this.fetchLikes(userId);
+          this.fetchFollowers(userId);
+          this.fetchFollowings(userId);
         }
       }
     );
@@ -139,7 +144,10 @@ export default {
     },
     async fetchTweets(id) {
       try {
-        const data = await usersAPI.getTweets(id);
+        const tweetsPromise = usersAPI.getTweets(id);
+        console.log("🚀 ~ file: User.vue:148 ~ fetchTweets ~ tweetsPromise:", tweetsPromise);
+
+        const data = await tweetsPromise;
         this.tweets = data;
         Toast.fire({
           title: " you got the right tweets data!",
@@ -178,37 +186,32 @@ export default {
         });
       }
     },
-    // async fetchFollowers(userId) {
-    //   try {
-    //     const { data } = await usersAPI.getFollowers({ userId });
-    //     if (data.isEmpty) {
-    //       console.log("error", data.isEmpty);
-    //       this.Followers = [];
-    //       return;
-    //     }
-    //     this.Followers = data;
-    //   } catch (error) {
-    //     console.log("error", error);
-    //     Toast2.fire({
-    //       title: "無法取得資料，請稍後再試",
-    //     });
-    //   }
-    // },
-    // async fetchFollowings(userId) {
-    //   try {
-    //     const { data } = await usersAPI.getFollowings({ userId });
-    //     if (data.isEmpty) {
-    //       this.Followings = [];
-    //       return;
-    //     }
-    //     this.Followings = data;
-    //   } catch (error) {
-    //     console.log("error", error);
-    //     Toast2.fire({
-    //       title: "無法取得該Followings資料，請稍後再試",
-    //     });
-    //   }
-    // },
+    async fetchFollowers(id) {
+      try {
+        const data = await usersAPI.getFollowers(id);
+
+        this.Followers = data;
+        console.log("get the right Followers data!");
+      } catch (error) {
+        console.log("error from the component", error);
+        Toast2.fire({
+          title: "Unable to retrieve user data.",
+        });
+      }
+    },
+    async fetchFollowings(id) {
+      try {
+        const data = await usersAPI.getFollowings(id);
+
+        this.Followings = data;
+        console.log("get the right Followings data!");
+      } catch (error) {
+        console.log("error from the component", error);
+        Toast2.fire({
+          title: "Unable to retrieve user data.",
+        });
+      }
+    },
     // async fetchTopUsers() {
     //   try {
     //     const { data } = await usersAPI.getTopUser();
