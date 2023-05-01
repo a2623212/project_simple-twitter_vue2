@@ -14,7 +14,7 @@
           </router-link>
         </li>
         <li :class="{ active: currentStatus.isUser }">
-          <router-link :to="{ name: 'user', params: { id: 'UserId' } }" class="menu__item">
+          <router-link :to="{ name: 'user', params: { id: currentUser.id } }" class="menu__item">
             <img src="../assets/icon_user.png" alt="index" class="user" />
             <span class="menu__item__title">個人資料</span>
           </router-link>

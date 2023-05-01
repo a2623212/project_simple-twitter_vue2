@@ -45,6 +45,7 @@
 
 <script>
 import { Toast, Toast2 } from "./../utils/helper";
+import authorizationApi from "../apis/authorization";
 
 export default {
   name: "login",
@@ -57,53 +58,61 @@ export default {
         password: false,
         account: false,
       },
-      seedAccound: "12345678",
-      seedPassword: "0000",
     };
   },
   methods: {
-    handleSubmit() {
-      const userAccount = this.account;
-      const userPassword = this.password;
-      // 等待中登錄btn disable
-      this.isProcessing = true;
-      // 表單驗證
-      if (!userAccount) {
-        this.error.account = true;
-        this.isProcessing = false;
-        return;
-      } else {
+    async handleSubmit(loginData) {
+      try {
+        this.isProcessing = true;
+        if (!this.account) {
+          this.error.account = true;
+          this.isProcessing = false;
+          return;
+        }
+
+        if (!this.password) {
+          this.error.account = false;
+          this.error.password = true;
+          this.isProcessing = false;
+          return;
+        }
+
         this.error.account = false;
-      }
-
-      if (!userPassword) {
-        this.error.password = true;
-        this.isProcessing = false;
-        return;
-      } else {
         this.error.password = false;
-      }
 
-      // Check the account and put in localStorage
+        loginData = {
+          account: this.account,
+          password: this.password,
+        };
+        const { data } = await authorizationApi.login(loginData);
 
-      if (userAccount === this.seedAccound && userPassword === this.seedPassword) {
-        // put in localStorage
-        localStorage.setItem("userAccount", userAccount);
-        localStorage.setItem("userPassword", userPassword);
-      } else {
+        if (data) {
+          console.log("Successfully login!");
+          localStorage.setItem("token", "test10000");
+          //成功登入後轉址到首頁
+          Toast.fire({
+            title: "sucessfullt to login!",
+          });
+          this.$router.push("/main");
+        } else {
+          Toast2.fire({
+            title: "Seems your input is wrong！",
+          });
+          this.isProcessing = false;
+          return;
+        }
+      } catch (error) {
         Toast2.fire({
-          title: "輸入帳號密碼有誤！",
+          title: "Sorry for the site crash!",
         });
         this.isProcessing = false;
         return;
       }
-
-      // 成功登入後轉址到餐廳首頁
-      Toast.fire({
-        title: "登入成功！",
-      });
-      this.$router.push("/main");
     },
+
+    // handleSubmit() {
+
+    // },
   },
 };
 </script>

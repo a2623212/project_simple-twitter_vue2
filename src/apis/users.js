@@ -117,8 +117,6 @@ export default {
   },
   //抓currentUser到vuex
   getCurrentUser() {
-    return apiHelper.get("/user", {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    return apiHelper.get("/currentUser");
   },
 };
