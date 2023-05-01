@@ -2,23 +2,15 @@
   <div>
     <main class="main">
       <div class="cover">
-        <img
-          :src="user.cover | emptyImage"
-          alt="cover"
-          class="cover__picture"
-        />
+        <img :src="user.cover | emptyImage" alt="cover" class="cover__picture" />
       </div>
       <div class="user-avatar">
-        <img
-          :src="user.avatar | emptyImage"
-          alt="avatar"
-          class="user-avatar__picture"
-        />
+        <img :src="user.userAvatar | emptyImage" alt="avatar" class="user-avatar__picture" />
       </div>
       <div class="user-edit">
         <button
           class="user-edit__btn"
-          v-if="user.id === currentUser.id"
+          v-if="user.userId === currentUser.id"
           id="show-modal"
           @click="showModal = true"
         >

@@ -1,20 +1,13 @@
 <template>
   <div class="container">
     <div class="navbar">
-      <Navbar
-        :current-status="currentStatus"
-        @after-create-tweet-modal="afterCreateTweetModal"
-      />
+      <Navbar :current-status="currentStatus" @after-create-tweet="afterCreateTweet" />
     </div>
     <div class="main">
       <header class="header">
         <button>
           <router-link to="/main"
-            ><img
-              src="./../assets/arrow.png"
-              alt="backarrow"
-              class="previous-btn"
-            />
+            ><img src="./../assets/arrow.png" alt="backarrow" class="previous-btn" />
           </router-link>
         </button>
         <div class="title">
@@ -69,26 +62,30 @@ export default {
   },
   computed: {
     ...mapState(["currentUser", "isAuthenticated"]),
+    thisUserId() {
+      return Number(this.$route.params.id);
+    },
   },
   created() {
-    const userId = this.$route.params.id;
-    this.fetchUser(userId);
-    this.fetchTweets(userId);
-    this.fetchLikes(userId);
-    this.fetchReplies(userId);
-    this.fetchFollowers(userId);
-    this.fetchFollowings(userId);
+    const thisUserId = this.thisUserId;
+    this.fetchUser(thisUserId);
+    this.fetchTweets(thisUserId);
+    this.fetchReplies(thisUserId);
+    this.fetchLikes(thisUserId);
+    this.fetchFollowers(thisUserId);
+    this.fetchFollowings(thisUserId);
     this.$watch(
       () => this.$route.params,
       (newV, oldV) => {
         if (newV.id === oldV.id) {
           return;
         } else {
-          const userId = newV.id;
+          const userId = Number(newV.id);
+          console.log("renew the page", userId);
           this.fetchUser(userId);
           this.fetchTweets(userId);
-          this.fetchLikes(userId);
           this.fetchReplies(userId);
+          this.fetchLikes(userId);
           this.fetchFollowers(userId);
           this.fetchFollowings(userId);
         }
@@ -104,9 +101,9 @@ export default {
         isSetting: false,
       },
       user: {
-        id: -1,
+        userId: -1,
         name: "",
-        avatar: "",
+        userAvatar: "",
         introduction: "",
         account: "",
         cover: "",
@@ -123,186 +120,132 @@ export default {
     };
   },
   methods: {
-    async fetchUser(userId) {
+    async fetchUser(id) {
       try {
-        this.isLoading = true;
-        const { data } = await usersAPI.get({ userId });
-        if (data.message === "Error: 帳號不存在！") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "無此帳號，請稍後再試",
-          });
-        }
-        const {
-          id,
-          name,
-          avatar,
-          introduction,
-          account,
-          cover,
-          Followers,
-          Followings,
-        } = data;
+        const data = await usersAPI.get(id);
+        const { userId, name, userAvatar, introduction, account, cover, followers, followings } =
+          data;
         this.user = {
-          id,
+          userId,
           name,
-          avatar,
+          userAvatar,
           introduction,
           account,
           cover,
-          followersLength: Followers ? Followers.length : 0,
-          followingsLength: Followings ? Followings.length : 0,
+          followersLength: followers ? followers.length : 0,
+          followingsLength: followings ? followings.length : 0,
         };
-        this.isLoading = false;
       } catch (error) {
-        console.log("error", error);
+        console.log(error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
-    async fetchTweets(userId) {
+    async fetchTweets(id) {
       try {
-        const { data } = await usersAPI.getTweets({ userId });
-        if (data.isEmpty) {
-          this.tweets = [];
-          return;
-        }
-        if (data.message === "Error: User has no tweets") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "目前沒有推文內容",
-          });
-          this.tweets = [];
-          return;
-        }
+        const tweetsPromise = usersAPI.getTweets(id);
+        console.log("🚀 ~ file: User.vue:148 ~ fetchTweets ~ tweetsPromise:", tweetsPromise);
+
+        const data = await tweetsPromise;
         this.tweets = data;
+        Toast.fire({
+          title: " you got the right tweets data!",
+        });
       } catch (error) {
         console.log("error", error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
     async fetchReplies(userId) {
       try {
-        const { data } = await usersAPI.getReplies({ userId });
-        if (data.isEmpty) {
-          this.replyTweets = [];
-          return;
-        }
-        if (data.message === "Error: No replies") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "目前沒有推文及回覆內容",
-          });
-          this.replyTweets = [];
-          return;
-        }
+        const data = await usersAPI.getReplies(userId);
         this.replyTweets = data;
+        Toast.fire({
+          title: " you got the right replies data!",
+        });
       } catch (error) {
         console.log("error", error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
     // empty:處理面對空值的回傳方法
     async fetchLikes(userId) {
       try {
-        const { data } = await usersAPI.getLikes({ userId });
-        if (
-          data.message ===
-          "TypeError: Cannot read properties of null (reading 'Likes')"
-        ) {
-          Toast2.fire({
-            title: "目前沒有喜歡的內容",
-          });
-          this.likes = [];
-          return;
-        }
-        if (data.isEmpty) {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "目前沒有喜歡的內容",
-          });
-          this.likes = [];
-          return;
-        }
+        const data = await usersAPI.getLikes(userId);
         this.likes = data;
+        console.log("get the right Likes data!");
       } catch (error) {
         console.log("error", error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
-        this.likes = [];
       }
     },
-    async fetchFollowers(userId) {
+    async fetchFollowers(id) {
       try {
-        const { data } = await usersAPI.getFollowers({ userId });
-        if (data.isEmpty) {
-          console.log("error", data.isEmpty);
-          this.Followers = [];
-          return;
-        }
+        const data = await usersAPI.getFollowers(id);
+
         this.Followers = data;
+        console.log("get the right Followers data!");
       } catch (error) {
-        console.log("error", error);
+        console.log("error from the component", error);
         Toast2.fire({
-          title: "無法取得資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
-    async fetchFollowings(userId) {
+    async fetchFollowings(id) {
       try {
-        const { data } = await usersAPI.getFollowings({ userId });
-        if (data.isEmpty) {
-          this.Followings = [];
-          return;
-        }
+        const data = await usersAPI.getFollowings(id);
+
         this.Followings = data;
+        console.log("get the right Followings data!");
       } catch (error) {
-        console.log("error", error);
+        console.log("error from the component", error);
         Toast2.fire({
-          title: "無法取得該Followings資料，請稍後再試",
+          title: "Unable to retrieve user data.",
         });
       }
     },
-    async fetchTopUsers() {
-      try {
-        const { data } = await usersAPI.getTopUser();
-        this.topUsers = data;
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法取得資料，請稍後再試",
-        });
-      }
-    },
-    async handleAddLike(tweetId) {
-      try {
-        const { data } = await tweetsAPI.addLike({ tweetId });
-        if (data.status === "error") {
-          throw new Error(data.message);
-        }
-        this.tweets = this.tweets.map((tweet) => {
-          if (tweet.tweetId === tweetId) {
-            return {
-              ...tweet,
-              LikesCount: tweet.LikesCount + 1,
-              isLiked: true,
-            };
-          }
-          return tweet;
-        });
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法新增喜歡，請稍後再試",
-        });
-      }
-    },
+    // async fetchTopUsers() {
+    //   try {
+    //     const { data } = await usersAPI.getTopUser();
+    //     this.topUsers = data;
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法取得資料，請稍後再試",
+    //     });
+    //   }
+    // },
+    // async handleAddLike(tweetId) {
+    //   try {
+    //     const { data } = await tweetsAPI.addLike({ tweetId });
+    //     if (data.status === "error") {
+    //       throw new Error(data.message);
+    //     }
+    //     this.tweets = this.tweets.map((tweet) => {
+    //       if (tweet.tweetId === tweetId) {
+    //         return {
+    //           ...tweet,
+    //           LikesCount: tweet.LikesCount + 1,
+    //           isLiked: true,
+    //         };
+    //       }
+    //       return tweet;
+    //     });
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法新增喜歡，請稍後再試",
+    //     });
+    //   }
+    // },
     async handleDeleteLike(tweetId) {
       try {
         const { data } = await tweetsAPI.deleteLike({ tweetId });
@@ -322,149 +265,149 @@ export default {
       } catch (error) {
         console.log("error", error);
         Toast2.fire({
-          title: "無法取消喜歡，請稍後再試",
+          title: "Unable to unlike!",
         });
       }
     },
-    async handleDeleteLikePost(tweetId) {
-      try {
-        const { data } = await tweetsAPI.deleteLike({ tweetId });
-        if (data.status === "error") {
-          throw new Error(data.message);
-        }
-        this.likes = this.likes.filter((like) => {
-          return like.TweetId !== tweetId;
-        });
+    // async handleDeleteLikePost(tweetId) {
+    //   try {
+    //     const { data } = await tweetsAPI.deleteLike({ tweetId });
+    //     if (data.status === "error") {
+    //       throw new Error(data.message);
+    //     }
+    //     this.likes = this.likes.filter((like) => {
+    //       return like.TweetId !== tweetId;
+    //     });
 
-        Toast.fire({
-          title: "成功取消喜歡！",
-        });
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法取消喜歡，請稍後再試",
-        });
-      }
-    },
-    async handleRemoveFollowship(userId) {
-      try {
-        const { data } = await usersAPI.removeFollowship({ userId });
-        if (data.message === "Error: Cannot unfollow yourself!") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "不能取消跟隨自己",
-          });
-          return;
-        }
-        if (data.message === "Error: You have not followed this user.!") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "已經取消跟隨",
-          });
-          return;
-        }
-        Toast.fire({
-          title: "成功取消跟隨！",
-        });
+    //     Toast.fire({
+    //       title: "成功取消喜歡！",
+    //     });
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法取消喜歡，請稍後再試",
+    //     });
+    //   }
+    // },
+    // async handleRemoveFollowship(userId) {
+    //   try {
+    //     const { data } = await usersAPI.removeFollowship({ userId });
+    //     if (data.message === "Error: Cannot unfollow yourself!") {
+    //       console.log("error", data.message);
+    //       Toast2.fire({
+    //         title: "不能取消跟隨自己",
+    //       });
+    //       return;
+    //     }
+    //     if (data.message === "Error: You have not followed this user.!") {
+    //       console.log("error", data.message);
+    //       Toast2.fire({
+    //         title: "已經取消跟隨",
+    //       });
+    //       return;
+    //     }
+    //     Toast.fire({
+    //       title: "成功取消跟隨！",
+    //     });
 
-        // 從Followings清單中移除相同id的人
-        this.Followings = this.Followings.filter((user) => {
-          return user.followingId !== userId;
-        });
-        // 正在跟隨人數變少
-        this.followingsLength - 1;
-        // 重整topuser資料
-        this.fetchTopUsers();
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          icon: "error",
-          title: "無法取消跟隨，請稍後再試",
-        });
-      }
-    },
-    async handleAddFollowship(userId) {
-      try {
-        const formData = { id: userId };
-        const { data } = await usersAPI.addFollowship({ formData });
-        if (data.message === "Error: You are already following this user.") {
-          Toast2.fire({
-            title: "已經跟隨該用戶",
-          });
-          return;
-        }
-        if (data.message === "Error: Cannot follow yourself!") {
-          Toast2.fire({
-            title: "無法跟隨此用戶",
-          });
-        }
-        // 對原本沒有跟隨的人跟隨
-        this.Followers = this.Followers.map((user) => {
-          if (user.followerId === userId) {
-            return {
-              ...user,
-              isFollowed: true,
-            };
-          }
-          return user;
-        });
-        Toast.fire({
-          title: "成功跟隨此用戶",
-        });
-        this.fetchFollowings(this.user.id);
-        // 跟隨人數加1
-        this.followingsLength + 1;
-        // 重整topuser資料
-        this.fetchTopUsers();
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法新增跟隨，請稍後再試",
-        });
-      }
-    },
-    async handleDelFollowship(userId) {
-      try {
-        const { data } = await usersAPI.removeFollowship({ userId });
-        if (data.message === "Error: Cannot unfollow yourself!") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "不能取消跟隨自己",
-          });
-          return;
-        }
-        if (data.message === "Error: You have not followed this user.!") {
-          console.log("error", data.message);
-          Toast2.fire({
-            title: "已經取消跟隨",
-          });
-          return;
-        }
-        Toast.fire({
-          title: "成功取消跟隨！",
-        });
+    //     // 從Followings清單中移除相同id的人
+    //     this.Followings = this.Followings.filter((user) => {
+    //       return user.followingId !== userId;
+    //     });
+    //     // 正在跟隨人數變少
+    //     this.followingsLength - 1;
+    //     // 重整topuser資料
+    //     this.fetchTopUsers();
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       icon: "error",
+    //       title: "無法取消跟隨，請稍後再試",
+    //     });
+    //   }
+    // },
+    // async handleAddFollowship(userId) {
+    //   try {
+    //     const formData = { id: userId };
+    //     const { data } = await usersAPI.addFollowship({ formData });
+    //     if (data.message === "Error: You are already following this user.") {
+    //       Toast2.fire({
+    //         title: "已經跟隨該用戶",
+    //       });
+    //       return;
+    //     }
+    //     if (data.message === "Error: Cannot follow yourself!") {
+    //       Toast2.fire({
+    //         title: "無法跟隨此用戶",
+    //       });
+    //     }
+    //     // 對原本沒有跟隨的人跟隨
+    //     this.Followers = this.Followers.map((user) => {
+    //       if (user.followerId === userId) {
+    //         return {
+    //           ...user,
+    //           isFollowed: true,
+    //         };
+    //       }
+    //       return user;
+    //     });
+    //     Toast.fire({
+    //       title: "成功跟隨此用戶",
+    //     });
+    //     this.fetchFollowings(this.user.id);
+    //     // 跟隨人數加1
+    //     this.followingsLength + 1;
+    //     // 重整topuser資料
+    //     this.fetchTopUsers();
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法新增跟隨，請稍後再試",
+    //     });
+    //   }
+    // },
+    // async handleDelFollowship(userId) {
+    //   try {
+    //     const { data } = await usersAPI.removeFollowship({ userId });
+    //     if (data.message === "Error: Cannot unfollow yourself!") {
+    //       console.log("error", data.message);
+    //       Toast2.fire({
+    //         title: "不能取消跟隨自己",
+    //       });
+    //       return;
+    //     }
+    //     if (data.message === "Error: You have not followed this user.!") {
+    //       console.log("error", data.message);
+    //       Toast2.fire({
+    //         title: "已經取消跟隨",
+    //       });
+    //       return;
+    //     }
+    //     Toast.fire({
+    //       title: "成功取消跟隨！",
+    //     });
 
-        // 改變跟隨的狀態
-        this.Followers = this.Followers.map((user) => {
-          if (user.followerId === userId) {
-            return {
-              ...user,
-              isFollowed: false,
-            };
-          }
-          return user;
-        });
-        // 正在跟隨人數變少
-        this.followingsLength - 1;
-        // 重整topuser資料
-        this.fetchTopUsers();
-      } catch (error) {
-        console.log("error", error);
-        Toast2.fire({
-          title: "無法取消跟隨，請稍後再試",
-        });
-      }
-    },
+    //     // 改變跟隨的狀態
+    //     this.Followers = this.Followers.map((user) => {
+    //       if (user.followerId === userId) {
+    //         return {
+    //           ...user,
+    //           isFollowed: false,
+    //         };
+    //       }
+    //       return user;
+    //     });
+    //     // 正在跟隨人數變少
+    //     this.followingsLength - 1;
+    //     // 重整topuser資料
+    //     this.fetchTopUsers();
+    //   } catch (error) {
+    //     console.log("error", error);
+    //     Toast2.fire({
+    //       title: "無法取消跟隨，請稍後再試",
+    //     });
+    //   }
+    // },
     handleUpdate(formData) {
       const { name, avatar, cover, introduction } = formData;
       this.user = {
@@ -486,33 +429,33 @@ export default {
     handleAddPop() {
       this.user.followingsLength + 1;
     },
-    afterCreateTweetModal(payload) {
+    afterCreateTweet(payload) {
+      console.log("text:", payload);
       const {
+        userAvatar,
         UserId,
         name,
-        image,
         account,
         description,
-        createdAt,
-        LikesCount,
         RepliesCount,
+        LikesCount,
+        createdAt,
       } = payload;
-      const createaData = {
-        createdAt,
+      this.posts.unshift({
+        userAvatar,
+        UserId,
+        name,
+        account,
         description,
-        image,
-        LikesCount,
         RepliesCount,
-        User: {
-          id: UserId,
-          name,
-          account,
-          avatar: image,
-        },
-        isLiked: false,
-      };
-      this.tweets.unshift(createaData);
+        LikesCount,
+        createdAt,
+      });
+      Toast.fire({
+        title: "Tweet Successfully!",
+      });
     },
+
     handleCancelCover() {
       this.user.cover = "";
     },
