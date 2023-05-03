@@ -11,10 +11,20 @@ export default {
   register(formData) {
     return apiHelper.post("/users", formData);
   },
-  adminLogin({ account, password }) {
-    return apiHelper.post("/admin/signin", {
+  async adminLogin({ account, password }) {
+    const adminData = await apiHelper.get("/admin");
+    const {
+      data: { posts, users },
+    } = adminData;
+    const signIn = {
       account,
       password,
-    });
+    };
+    const newData = {
+      signIn,
+      posts,
+      users,
+    };
+    return apiHelper.post("/admin", newData);
   },
 };

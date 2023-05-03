@@ -1,29 +1,42 @@
 import { apiHelper } from "../utils/helper";
-const getToken = () => localStorage.getItem("token");
+// const getToken = () => localStorage.getItem("token");
+const getAdmin = () => apiHelper.get("/admin");
 
 export default {
   users: {
-    get() {
-      return apiHelper.get("/admin/users", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+    async get() {
+      const { data } = await getAdmin();
+      const usersList = data.users;
+      return usersList;
     },
   },
   tweets: {
     // 取得使用者清單
-    get() {
-      return apiHelper.get("/admin/tweets", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+    async get() {
+      const { data } = await getAdmin();
+      const tweetsList = data.posts;
+
+      return tweetsList;
     },
-    delete({ tweetId }) {
-      return apiHelper.delete(`/admin/tweets/${tweetId}`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
+
+    async delete(number) {
+      const adminData = await getAdmin();
+
+      const {
+        data: { signIn, users, posts },
+      } = adminData;
+
+      const newTweetsList = posts.filter((tweet) => {
+        return tweet.id !== number;
       });
+
+      const newData = {
+        signIn,
+        posts: newTweetsList,
+        users,
+      };
+
+      return apiHelper.post("/admin", newData);
     },
   },
 };

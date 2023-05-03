@@ -41,7 +41,7 @@ export default {
     //抓所有user的資料
     async fetchUser() {
       try {
-        const { data } = await adminAPI.users.get();
+        const data = await adminAPI.users.get();
         this.users = data;
       } catch (error) {
         Toast2.fire({

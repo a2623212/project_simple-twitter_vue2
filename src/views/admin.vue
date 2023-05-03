@@ -38,9 +38,7 @@
         <div v-if="error.password" class="invalid-message">密碼不得空白！</div>
       </div>
 
-      <button class="btnLogin" type="submit" :disabled="isProcessing">
-        登入
-      </button>
+      <button class="btnLogin" type="submit" :disabled="isProcessing">登入</button>
 
       <div class="text-link">
         <router-link to="/login" class="btnFontLogin">前台登入</router-link>
@@ -85,17 +83,17 @@ export default {
           account: this.account,
           password: this.password,
         });
+        console.log("🚀 ~ file: admin.vue:86 ~ handleSubmit ~ response:", response);
 
-        const { data } = response;
-
-        if (data.status === "error") {
-          throw new Error(data.message);
+        if (response.status !== 201) {
+          throw new Error("請確認您輸入的帳號密碼");
         }
+
         Toast.fire({
-          title: "管理員，歡迎您！",
+          title: "Welcome!",
         });
 
-        localStorage.setItem("token", data.token);
+        // localStorage.setItem("token", data.token);
         this.$router.push("/admin/main");
       } catch (error) {
         Toast2.fire({

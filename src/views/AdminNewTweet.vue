@@ -9,10 +9,7 @@
       <div class="title">
         <h1>推文清單</h1>
       </div>
-      <adminTweetList
-        :tweets="tweets"
-        @after-delete-tweet="handleDeleteTweet"
-      />
+      <adminTweetList :tweets="tweets" @after-delete-tweet="handleDeleteTweet" />
     </div>
   </div>
 </template>
@@ -21,7 +18,7 @@ import AdminNewNavbar from "./../components/AdminNewNavbar.vue";
 import adminTweetList from "./../components/adminTweetList.vue";
 import adminApi from "./../apis/admin";
 import { Toast2 } from "@/utils/helper";
-import { Toast } from "./../utils/helper";
+// import { Toast } from "./../utils/helper";
 
 export default {
   name: "adminNewTweet",
@@ -44,8 +41,7 @@ export default {
   methods: {
     async fetchAdminTweets() {
       try {
-        const { data } = await adminApi.tweets.get();
-
+        const data = await adminApi.tweets.get();
         this.tweets = data;
       } catch (error) {
         console.log("error", error);
@@ -57,18 +53,10 @@ export default {
     async handleDeleteTweet(tweetId) {
       try {
         console.log("2");
-        const { data } = await adminApi.tweets.delete({ tweetId });
-        if (data.message === "Error: Tweet not exist!") {
-          Toast2.fire({
-            title: "此推文已不存在",
-          });
-          return;
-        }
-        if (data.message === "Tweet deleted!") {
-          Toast.fire({
-            title: "成功刪除此貼文！",
-          });
-        }
+        console.log(tweetId);
+        const { data } = await adminApi.tweets.delete(tweetId);
+        console.log("🚀 ~ file: AdminNewTweet.vue:57 ~ handleDeleteTweet ~  data:", data);
+
         this.tweets = this.tweets.filter((tweet) => {
           return tweet.tweetId !== tweetId;
         });
