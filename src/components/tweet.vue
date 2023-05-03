@@ -25,9 +25,6 @@
 </template>
 
 <script>
-// import tweetsAPI from "../apis/tweets.js";
-import { Toast } from "./../utils/helper";
-// import { Toast2 } from "./../utils/helper";
 import { mapState } from "vuex";
 import { emptyImageFilter } from "../utils/mixins";
 
@@ -59,10 +56,7 @@ export default {
       }
       this.textToMuch = false;
       this.noSpace = false;
-      console.log("text:", this.text);
-      Toast.fire({
-        title: "Tweet Sucessfully",
-      });
+
       const payload = {
         userAvatar: this.currentUser.avatar,
         UserId: this.currentUser.id,
@@ -74,6 +68,7 @@ export default {
         createdAt: new Date(),
       };
       this.$emit("after-create-tweet", payload);
+      this.isLoading = false;
       this.text = "";
     },
   },
@@ -85,7 +80,7 @@ export default {
   width: 600px;
   display: flex;
   flex-direction: column;
-  
+
   .home {
     opacity: 0.9;
     z-index: 995;

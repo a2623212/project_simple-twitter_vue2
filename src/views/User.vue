@@ -145,12 +145,10 @@ export default {
     async fetchTweets(id) {
       try {
         const tweetsPromise = usersAPI.getTweets(id);
-        console.log("🚀 ~ file: User.vue:148 ~ fetchTweets ~ tweetsPromise:", tweetsPromise);
-
         const data = await tweetsPromise;
         this.tweets = data;
         Toast.fire({
-          title: " you got the right tweets data!",
+          title: " you got the right data!",
         });
       } catch (error) {
         console.log("error", error);
@@ -429,31 +427,41 @@ export default {
     handleAddPop() {
       this.user.followingsLength + 1;
     },
-    afterCreateTweet(payload) {
-      console.log("text:", payload);
-      const {
-        userAvatar,
-        UserId,
-        name,
-        account,
-        description,
-        RepliesCount,
-        LikesCount,
-        createdAt,
-      } = payload;
-      this.posts.unshift({
-        userAvatar,
-        UserId,
-        name,
-        account,
-        description,
-        RepliesCount,
-        LikesCount,
-        createdAt,
-      });
-      Toast.fire({
-        title: "Tweet Successfully!",
-      });
+    // async createTweet and
+    async afterCreateTweet(payload) {
+      try {
+        const { data } = await tweetsAPI.createTweet(payload);
+        const {
+          userAvatar,
+          UserId,
+          name,
+          account,
+          description,
+          RepliesCount,
+          LikesCount,
+          createdAt,
+        } = data;
+        const tweetId = data.id;
+        this.tweets.unshift({
+          tweetId,
+          userAvatar,
+          UserId,
+          name,
+          account,
+          description,
+          RepliesCount,
+          LikesCount,
+          createdAt,
+        });
+        Toast.fire({
+          title: "Tweet Successfully!",
+        });
+      } catch (error) {
+        console.log("this error is on the api");
+        Toast2.fire({
+          title: "can't tweet now",
+        });
+      }
     },
 
     handleCancelCover() {

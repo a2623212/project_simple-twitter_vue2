@@ -65,7 +65,6 @@ export default {
         this.isLoading = false;
         return (this.noSpace = true);
       }
-      console.log("text:", this.text);
       const payload = {
         userAvatar: this.currentUser.avatar,
         UserId: this.currentUser.id,
@@ -76,6 +75,7 @@ export default {
         LikesCount: 0,
         createdAt: new Date(),
       };
+
       this.$emit("after-create-tweet", payload);
       this.textToMuch = false;
       this.noSpace = false;

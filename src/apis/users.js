@@ -41,7 +41,6 @@ export default {
       const thisUser = await filterUser(userId);
 
       const result = thisUser.tweets;
-      console.log("🚀 ~ file: users.js:22 ~ getTweets ~ result:", result);
 
       return result;
     } catch (error) {

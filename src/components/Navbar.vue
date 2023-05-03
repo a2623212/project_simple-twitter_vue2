@@ -62,12 +62,11 @@ export default {
     };
   },
   methods: {
-    afterCreateTweet(payload) {
-      this.$emit("after-create-tweet", payload);
+    afterCreateTweet(data) {
+      this.$emit("after-create-tweet", data);
     },
     logOut() {
-      localStorage.removeItem("userAccount");
-      localStorage.removeItem("userPassword");
+      localStorage.removeItem("token");
       this.$router.push("/login");
     },
   },
