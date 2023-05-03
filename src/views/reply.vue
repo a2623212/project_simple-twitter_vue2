@@ -6,14 +6,11 @@
         <img src="./../assets/arrow.png" alt="" />
         <h4>推文</h4>
       </a>
-      <Post
-        :initial-tweet="reply"
-        @after-create-reply-modal="afterCreateReplyModal"
-      />
+      <Post :initial-tweet="reply" @after-create-reply-modal="afterCreateReplyModal" />
       <ReplyList
         :name="reply.name"
         :reply="item"
-        v-for="item in reply.Replies"
+        v-for="item in reply.replies"
         :key="item.replyId"
       />
     </div>
@@ -62,6 +59,10 @@ export default {
           throw new Error(data.message);
         }
         this.reply = data;
+
+        // check the data
+        const result = this.reply;
+        console.log("🚀 ~ file: reply.vue:63 ~ fetchReply ~ result:", result);
       } catch (error) {
         Toast2.fire({
           title: "目前無法取得貼文資訊",

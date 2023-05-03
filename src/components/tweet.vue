@@ -63,7 +63,7 @@ export default {
         name: this.currentUser.name,
         account: this.currentUser.account,
         description: this.text,
-        RepliesCount: 0,
+        replies: [],
         LikesCount: 0,
         createdAt: new Date(),
       };

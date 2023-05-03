@@ -2,33 +2,27 @@
   <div>
     <div class="container">
       <div class="avatar">
-        <router-link
-          :to="{ name: 'user-tweets', params: { id: reply.UserId } }"
-        >
-          <img :src="reply.avatar | emptyImage" alt="" class="avatar__pic" />
+        <router-link :to="{ name: 'user-tweets', params: { id: reply.userId } }">
+          <img :src="reply.userAvatar | emptyImage" alt="" class="avatar__pic" />
         </router-link>
       </div>
       <div class="tweet-content">
         <div class="title">
           <router-link
-            :to="{ name: 'user-tweets', params: { id: reply.UserId } }"
+            :to="{ name: 'user-tweets', params: { id: reply.userId } }"
             class="title__name"
             >{{ reply.name }}</router-link
           >
-          <router-link
-            :to="{ name: 'user-tweets', params: { id: reply.UserId } }"
-            class="title__id"
-            >@{{ reply.UserId }}</router-link
+          <router-link :to="{ name: 'user-tweets', params: { id: reply.userId } }" class="title__id"
+            >@{{ reply.account }}</router-link
           >
-          <router-link to="" class="title__formNow"
-            >．{{ reply.createdAt | fromNow }}</router-link
-          >
+          <router-link to="" class="title__formNow">．{{ reply.createdAt | fromNow }}</router-link>
         </div>
         <div class="hashtag">
           <router-link to="" class="hashtag__reply">回覆</router-link>
           <router-link to="" class="hashtag__userid">@{{ name }}</router-link>
         </div>
-        <p class="description">{{ reply.comment }}</p>
+        <p class="description">{{ reply.description }}</p>
       </div>
     </div>
   </div>
@@ -59,13 +53,13 @@ export default {
 </script>
 <style lang="scss" scoped>
 .container {
-  border-left: 1px #e6ecf0 solid;
-  border-right: 1px #e6ecf0 solid;
   width: 600px;
   min-height: 100px;
   display: flex;
-  border-top: 1px #e6ecf0 solid;
-  margin-bottom: 5px;
+  border-left: 1px #e6ecf0 solid;
+  border-right: 1px #e6ecf0 solid;
+  border-bottom: 1px #e6ecf0 solid;
+
   .description {
     word-break: break-all;
     font-size: 15px;

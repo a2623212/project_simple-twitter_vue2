@@ -1,11 +1,8 @@
 <template>
   <div>
     <div class="container">
-      <router-link
-        class="avatar"
-        :to="{ name: 'user-tweets', params: { id: tweet.UserId } }"
-      >
-        <img :src="tweet.image | emptyImage" alt="" class="avatar__pic" />
+      <router-link class="avatar" :to="{ name: 'user-tweets', params: { id: tweet.UserId } }">
+        <img :src="tweet.userAvatar | emptyImage" alt="" class="avatar__pic" />
         <div class="title">
           <h4 class="title__name">{{ tweet.name }}</h4>
           <h4 class="title__id">@{{ tweet.account }}</h4>
@@ -23,12 +20,7 @@
           <div class="count__unit">喜歡次數</div>
         </div>
         <div class="icon">
-          <img
-            src="./../assets/reply2.png"
-            class="icon__reply"
-            alt=""
-            @click="showModal = true"
-          />
+          <img src="./../assets/reply2.png" class="icon__reply" alt="" @click="showModal = true" />
           <Modal
             :show="showModal"
             :post="tweet"
@@ -140,15 +132,13 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  border-left: 1px #e6ecf0 solid;
-  border-right: 1px #e6ecf0 solid;
+  border: 1px #e6ecf0 solid;
   padding: 10px;
   width: 600px;
   min-height: 100px;
   display: flex;
   flex-direction: column;
-  border-top: 1px #e6ecf0 solid;
-  margin-bottom: 5px;
+
   .description {
     word-break: break-all;
     font-size: 1.3rem;

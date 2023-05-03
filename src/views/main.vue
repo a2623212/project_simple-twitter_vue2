@@ -62,24 +62,26 @@ export default {
       try {
         const { data } = await tweetsAPI.createTweet(payload);
         const {
+          id,
           userAvatar,
           UserId,
           name,
           account,
           description,
-          RepliesCount,
+          replies,
           LikesCount,
           createdAt,
         } = data;
         const tweetId = data.id;
         this.posts.unshift({
+          id,
           tweetId,
           userAvatar,
           UserId,
           name,
           account,
           description,
-          RepliesCount,
+          replies,
           LikesCount,
           createdAt,
         });

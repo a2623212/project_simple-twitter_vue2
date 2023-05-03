@@ -71,10 +71,11 @@ export default {
         name: this.currentUser.name,
         account: this.currentUser.account,
         description: this.text,
-        RepliesCount: 0,
+        replies: [],
         LikesCount: 0,
         createdAt: new Date(),
       };
+      console.log("🚀 ~ file: TweetModal.vue:78 ~ handleSubmit ~ payload:", payload);
 
       this.$emit("after-create-tweet", payload);
       this.textToMuch = false;

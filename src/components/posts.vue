@@ -1,10 +1,6 @@
 <template>
   <div>
-    <router-link
-      class="router-to-reply"
-      tag="div"
-      :to="{ name: 'reply', params: { id: post.tweetId } }"
-    >
+    <router-link class="router-to-reply" tag="div" :to="{ name: 'reply', params: { id: post.id } }">
       <div class="container">
         <router-link class="avatar" :to="{ name: 'user-tweets', params: { id: post.UserId } }">
           <img :src="post.userAvatar | emptyImage" alt="" class="avatar__pic" />
@@ -41,7 +37,7 @@
                 @after-create-reply-modal="afterCreateReplyModal"
               />
             </router-link>
-            <h5>{{ post.RepliesCount }}</h5>
+            <h5>{{ post.replies.length }}</h5>
             <img
               src="../assets/likedx2.png"
               class="icon__like"
