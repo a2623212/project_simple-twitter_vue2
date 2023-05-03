@@ -2,18 +2,18 @@
   <div>
     <router-link class="router-to-reply" tag="div" :to="{ name: 'reply', params: { id: post.id } }">
       <div class="container">
-        <router-link class="avatar" :to="{ name: 'user-tweets', params: { id: post.UserId } }">
+        <router-link class="avatar" :to="{ name: 'user-tweets', params: { id: post.userId } }">
           <img :src="post.userAvatar | emptyImage" alt="" class="avatar__pic" />
         </router-link>
         <div class="tweet-content">
           <div class="title">
             <router-link
-              :to="{ name: 'user-tweets', params: { id: post.UserId } }"
+              :to="{ name: 'user-tweets', params: { id: post.userId } }"
               class="title__name"
               >{{ post.name }}</router-link
             >
             <router-link
-              :to="{ name: 'user-tweets', params: { id: post.UserId } }"
+              :to="{ name: 'user-tweets', params: { id: post.userId } }"
               class="title__id"
               >@{{ post.account }}．</router-link
             >
@@ -63,7 +63,9 @@
 <script>
 import moment from "moment";
 import Modal from "./ReplyModal.vue";
+import replyAPI from "../apis/reply.js";
 import { emptyImageFilter } from "./../utils/mixins";
+import Toast from "../utils/helper";
 
 export default {
   components: {
@@ -88,10 +90,20 @@ export default {
     },
   },
   methods: {
-    afterCreateReplyModal(input) {
-      this.post.RepliesCount += 1;
-      console.log(input);
+    async afterCreateReplyModal({ id, comment }) {
+      try {
+        const { data } = await replyAPI.createReply({ id, comment });
+        if (data) {
+          Toast.fire({
+            title: "Thanks for the reply.",
+          });
+        }
+        this.post.replies.length += 1;
+      } catch (error) {
+        console.log("this error is from api:", error);
+      }
     },
+
     addLike: function () {
       this.post = {
         ...this.post,

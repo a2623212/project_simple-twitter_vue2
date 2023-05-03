@@ -9,11 +9,7 @@
         </div>
         <div class="reply-container">
           <div class="avatar">
-            <img
-              :src="post[0].User.avatar | emptyImage"
-              alt=""
-              class="avatar__pic"
-            />
+            <img :src="post[0].User.avatar | emptyImage" alt="" class="avatar__pic" />
             <div class="divider">
               <div class="divider__a"></div>
               <div class="divider__b"></div>
@@ -21,12 +17,8 @@
           </div>
           <div class="tweet-content">
             <div class="title">
-              <router-link to="" class="title__name">{{
-                post[0].User.name
-              }}</router-link>
-              <router-link to="" class="title__id"
-                >@{{ post[0].User.account }}</router-link
-              >
+              <router-link to="" class="title__name">{{ post[0].User.name }}</router-link>
+              <router-link to="" class="title__id">@{{ post[0].User.account }}</router-link>
               <router-link to="" class="title__formNow"
                 >．{{ post[0].createdAt | fromNow }}</router-link
               >
@@ -36,9 +28,7 @@
             </p>
             <div class="hashtag">
               <router-link to="" class="hashtag__reply">回覆</router-link>
-              <router-link to="" class="hashtag__userid"
-                >@{{ post[0].User.account }}</router-link
-              >
+              <router-link to="" class="hashtag__userid">@{{ post[0].User.account }}</router-link>
             </div>
           </div>
         </div>
@@ -147,7 +137,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="scss" scoped>
 .swal2-container.swal2-top-end > .swal2-popup {

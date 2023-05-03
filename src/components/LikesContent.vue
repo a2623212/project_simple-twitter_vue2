@@ -10,15 +10,8 @@
       v-else
     >
       <div class="container">
-        <router-link
-          class="avatar"
-          :to="{ name: 'user', params: { id: like.Tweet.User.id } }"
-        >
-          <img
-            :src="like.Tweet.User.avatar | emptyImage"
-            alt=""
-            class="avatar__pic"
-          />
+        <router-link class="avatar" :to="{ name: 'user', params: { id: like.Tweet.User.id } }">
+          <img :src="like.Tweet.User.avatar | emptyImage" alt="" class="avatar__pic" />
         </router-link>
         <div class="tweet-content">
           <div class="title">
@@ -38,15 +31,14 @@
             {{ like.Tweet.description }}
           </p>
           <div class="icon">
-            <router-link
-              :to="{ name: 'user-likes', params: { id: like.userId } }"
-            >
+            <router-link :to="{ name: 'user-likes', params: { id: like.userId } }">
               <img
                 src="../assets/reply2.png"
                 class="icon__reply"
                 alt=""
                 @click.stop.prevent="clickOnReply(like.TweetId)"
               />
+              {{ showModal }}
             </router-link>
             <h5>{{ like.Tweet.repliesCount }}</h5>
 
@@ -61,12 +53,7 @@
         </div>
       </div>
     </router-link>
-    <Modal
-      :post="replyingPost"
-      :show="showModal"
-      @close="showModal = false"
-      v-on="$listeners"
-    />
+    <Modal :post="replyingPost" :show="showModal" @close="showModal = false" v-on="$listeners" />
   </div>
 </template>
 
@@ -195,8 +182,7 @@ export default {
     &__reply,
     &__like {
       &:hover {
-        filter: invert(4%) sepia(4%) saturate(6670%) hue-rotate(22deg)
-          brightness(89%) contrast(88%);
+        filter: invert(4%) sepia(4%) saturate(6670%) hue-rotate(22deg) brightness(89%) contrast(88%);
       }
       z-index: 5;
       height: 15px;

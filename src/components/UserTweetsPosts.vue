@@ -32,8 +32,9 @@
                 src="../assets/reply2.png"
                 class="icon__reply"
                 alt=""
-                @click.stop.prevent="clickOnReply(tweet.tweetId)"
+                @click.stop.prevent="clickOnReply()"
               />
+              {{ showModal }}
             </router-link>
             <h5>{{ tweet.RepliesCount }}</h5>
 
@@ -56,13 +57,14 @@
         </div>
       </div>
     </router-link>
-    <Modal :post="replyingPost" :show="showModal" @close="showModal = false" v-on="$listeners" />
+    <Modal :post="replyingPost" :show="true" @close="showModal = false" v-on="$listeners" />
   </div>
 </template>
 
 <script>
 import moment from "moment";
-import Modal from "./UserReplyModal.vue";
+// import Modal from "./UserReplyModal.vue";
+import Modal from "./UserLikeReplyModal.vue";
 import { emptyImageFilter } from "./../utils/mixins";
 
 export default {
@@ -84,9 +86,13 @@ export default {
     };
   },
   methods: {
+    clickOnReply() {
+      console.log("🚀 ~ file: UserTweetsPosts.vue:94 ~ clickOnReply ~ clickOnReply:");
+      this.showModal = true;
+    },
     // 把 modal 放在外面才不會重覆呼叫多次modal component
-    clickOnReply(tweetId) {
-      console.log(tweetId);
+    afterCreateReplyModal() {
+      console.log("here is the reply ");
     },
     addLike(tweetId) {
       console.log(tweetId);

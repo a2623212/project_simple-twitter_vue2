@@ -14,7 +14,7 @@
         </p>
         <h5 class="create-time">{{ tweet.createdAt | fromNow }}</h5>
         <div class="count">
-          <div class="count__number">{{ tweet.RepliesCount }}</div>
+          <div class="count__number">{{ tweet.replies.length }}</div>
           <div class="count__unit">回覆</div>
           <div class="count__number">{{ tweet.LikesCount }}</div>
           <div class="count__unit">喜歡次數</div>

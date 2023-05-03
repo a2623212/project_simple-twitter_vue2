@@ -109,13 +109,11 @@ export default {
       this.noSpace = false;
       this.isLoading = false;
 
-      console.log(this.text);
-
       this.$emit("after-create-reply-modal", {
-        tweetId: this.post.tweetId,
+        id: this.post.id,
         comment: this.text,
       });
-
+      this.text = "";
       this.$emit("close");
       Toast.fire({
         title: "回覆成功",
